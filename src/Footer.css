@@ -1,6 +1,6 @@
 .footer {
-    background-color: #111827; /* Dark background */
-    color: #d1d5db; /* Light gray text */
+    background-color: #111827; 
+    color: #d1d5db; 
     padding: 4rem 0 2rem 0;
     margin-top: 4rem;
 }
@@ -64,7 +64,7 @@
 }
 
 .footer-links a:hover {
-    color: #10b981; /* Your brand's green */
+    color: #10b981; 
 }
 
 .footer-contact {

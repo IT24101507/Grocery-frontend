@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { ShoppingCart, Search, User } from 'lucide-react';
 import './Header.css'; // We'll create a dedicated CSS file for the header
+import { useAuth } from './useAuth';
 
 const Header = () => {
-    // We can manage cart items globally later (e.g., with Context API)
-    // For now, this is just for display.
-    const [cartItems] = useState(0); 
+    const { isLoggedIn, profilePictureUrl } = useAuth();
+    const [cartItems] = React.useState(0);
 
     return (
         <header className="header">
@@ -41,11 +41,6 @@ const Header = () => {
                             />
                         </div>
 
-                        {/* User Profile */}
-                        <Link to="/login" className="icon-btn">
-                            <User size={20} />
-                        </Link>
-
                         {/* Cart */}
                         <Link to="/cart" className="cart-btn">
                             <ShoppingCart size={18} />
@@ -56,6 +51,29 @@ const Header = () => {
                                 </span>
                             )}
                         </Link>
+
+                        {/* Conditional User Profile/Login Button */}
+                        {isLoggedIn ? (
+                            <Link to="/profile" className="icon-btn profile-pic-btn">
+                                {profilePictureUrl ? (
+                                    <img 
+                                        src={profilePictureUrl} 
+                                        alt="Profile" 
+                                        className="profile-pic"
+                                        onError={(e) => {
+                                            console.log('Profile picture failed to load:', profilePictureUrl);
+                                            e.target.style.display = 'none';
+                                            e.target.nextSibling.style.display = 'flex';
+                                        }}
+                                    />
+                                ) : null}
+                                <User size={20} style={{ display: profilePictureUrl ? 'none' : 'flex' }} />
+                            </Link>
+                        ) : (
+                            <Link to="/login" className="icon-btn">
+                                <User size={20} />
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>
