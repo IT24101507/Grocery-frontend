@@ -1,52 +1,39 @@
-<<<<<<< Updated upstream
-import React from 'react';
-// Import routing components
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
-// Import your components
-import GroceryStore from './GroceryStore'; // Assuming it's in src/
-import Login from './Login';
-import Register from './Register';
 
-// Import your main stylesheet
-import './GroceryStore.css';
-=======
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
-// Import the layout
 import MainLayout from './MainLayout';
-
-// Import your pages
 import GroceryStore from './GroceryStore';
 import Login from './Login';
 import Register from './Register';
-// Create a placeholder for Products and Contact if you haven't already
+import Verify from './Verify';
+
+
 const Products = () => <div>Products Page</div>;
 const Contact = () => <div>Contact Page</div>;
 const Cart = () => <div>Cart Page</div>;
->>>>>>> Stashed changes
+const Profile = () => <div>Profile Page</div>; 
 
 function App() {
+  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || "919339334239-kl7469709cpapu9dirknf3cml0rafliu.apps.googleusercontent.com";
+
   return (
+    <GoogleOAuthProvider clientId={googleClientId}>
     <Router>
       <Routes>
-<<<<<<< Updated upstream
-        <Route path="/" element={<GroceryStore />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-=======
-        {/* All routes inside here will have the header and footer */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<GroceryStore/>} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/verify" element={<Verify />} />
           <Route path="/products" element={<Products />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
->>>>>>> Stashed changes
       </Routes>
     </Router>
+    </GoogleOAuthProvider>
   );
 }
 
