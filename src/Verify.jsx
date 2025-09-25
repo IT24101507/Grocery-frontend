@@ -125,7 +125,7 @@ function Verify() {
     const token = searchParams.get('token');
 
     if (token) {
-      fetch(`http://localhost:8082/api/auth/verify?token=${token}`)
+      fetch(`http://localhost:8080/api/auth/verify?token=${token}`)
         .then(response => {
           if (response.ok) {
             showPopup('success', 'Verification Successful!', 'Your account has been verified successfully! You can now log in.');

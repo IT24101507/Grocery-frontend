@@ -139,7 +139,7 @@ const Register = () => {
         const newUser = { username, gmail, password, telephone, address, role: 'USER' };
 
         try {
-            const response = await axios.post('http://localhost:8082/api/auth/register', newUser);
+            const response = await axios.post('http://localhost:8080/api/auth/register', newUser);
             
             // Show success popup instead of alert
             showPopup('success', 'Registration Successful!', 'You have been registered successfully. Please check your email for verification.', username);

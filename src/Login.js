@@ -137,7 +137,7 @@ const Login = () => {
         setError(''); 
 
         try {
-            const response = await axios.post('http://localhost:8082/api/auth/login', {
+            const response = await axios.post('http://localhost:8080/api/auth/login', {
                 gmail,
                 password
             });
@@ -145,6 +145,11 @@ const Login = () => {
             if (response.data) {
                 const userData = response.data;
                 
+                console.log('Login response data:', userData);
+                console.log('userData.role:', userData.role);
+                console.log('userData.username:', userData.username);
+                console.log('userData.jwt:', userData.jwt);
+                console.log('userData.profilePictureUrl:', userData.profilePictureUrl);
                 
                 localStorage.setItem('userRole', userData.role);
                 localStorage.setItem('username', userData.username);
@@ -176,7 +181,7 @@ const Login = () => {
      const handleGoogleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        const response = await fetch('http://localhost:8082/api/auth/google', {
+        const response = await fetch('http://localhost:8080/api/auth/google', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

@@ -7,11 +7,11 @@ import GroceryStore from './GroceryStore';
 import Login from './Login';
 import Register from './Register';
 import Verify from './Verify';
+import CartPage from './CartPage';
 
 
 const Products = () => <div>Products Page</div>;
 const Contact = () => <div>Contact Page</div>;
-const Cart = () => <div>Cart Page</div>;
 const Profile = () => <div>Profile Page</div>; 
 
 function App() {
@@ -28,7 +28,7 @@ function App() {
           <Route path="/verify" element={<Verify />} />
           <Route path="/products" element={<Products />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/cart" element={<Cart />} />
+          <Route path="/cart" element={<CartPage />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
       </Routes>
