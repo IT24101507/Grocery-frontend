@@ -1,0 +1,280 @@
+/* Main container */
+.add-product-container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 25px;
+  border-radius: 10px;
+  position: relative;
+  z-index: 1;
+  background: url("../assets/images/background.jpg") no-repeat center center;
+  background-size: cover;
+  background-position: left 60% top 60%;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.add-product-container::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  z-index: -1;
+}
+
+/* Title */
+.form-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 750;
+  color: #14532d;
+  margin-bottom: 25px;
+}
+
+.form-title-icon {
+  color: #14532d;
+  margin-right: 10px;
+}
+
+/* Grid Layout */
+.form-grid {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+/* Columns */
+.form-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-column.right {
+  margin-top: 40px;
+}
+
+/* Form groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.form-group label {
+  font-weight: 650;
+  margin-bottom: 6px;
+  color: #14532d;
+  font-size: 16px; 
+}
+
+/* Inputs & dropdowns */
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: #ffffff !important;
+  font-size: 14px;  
+  color: #333;      
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+/* Placeholder styling */
+input::placeholder,
+textarea::placeholder {
+  color: #888;
+  font-size: 15px;
+}
+
+/* Textarea */
+textarea {
+  resize: none;
+  min-height: 120px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #f97316;
+  background: #fff;
+  box-shadow: 0 0 4px rgba(249, 115, 22, 0.4);
+}
+
+/* Dropdown styling */
+select {
+  appearance: none;
+  -webkit-appearance: none; /* Safari */
+  -moz-appearance: none;    /* Firefox */
+  background: #fff no-repeat right 12px center;
+  background-size: 14px;
+  padding-right: 30px;
+  cursor: pointer;
+}
+
+select option {
+  padding: 10px;
+}
+
+/* Stock & Display Quantity Row */
+.stock-display-row {
+  display: flex;
+  flex-direction: column;
+  gap: 25px; /* space between Stock and Display groups */
+  margin-bottom: 25px;
+}
+
+/* Each group */
+.stock-group,
+.display-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Input + Unit Select side by side */
+.input-unit-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.input-unit-row input {
+  flex: 2;
+}
+
+.input-unit-row select {
+  flex: 1;
+}
+
+/* Clear button */
+.clear-btn {
+  align-self: flex-end;
+  margin-top: 5px;
+  background: #ff6600;
+  color: #fff;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.clear-btn:hover {
+  background: #e65c00;
+  transform: scale(1.05);
+}
+
+/* Image Upload */
+.image-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.image-upload .image-label {
+  display: block;
+  text-align: left;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.upload-box {
+  width: 150px;
+  height: 150px;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 12px auto;
+  background: #fff;
+  overflow: hidden;
+  position: relative;
+}
+
+.upload-label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.upload-icon {
+  font-size: 30px;
+  color: #6b7280;
+  opacity: 0.6;
+}
+
+.upload-box:hover {
+  border-color: #f97316;
+  background: #fff7ed;
+}
+
+.upload-box:hover .upload-icon {
+  opacity: 0.9;
+}
+
+/* Image preview */
+.image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+}
+
+/* Action buttons */
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 30px;
+  width: 100%;
+}
+
+.submit-btn {
+  background: #14532d;
+  color: #fff;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.submit-btn:hover {
+  background: #0c3f2e;
+  transform: scale(1.05);
+}
+
+.clear-all-btn {
+  background: #ff6600;
+  color: #fff;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.clear-all-btn:hover {
+  background: #e65c00;
+  transform: scale(1.05);
+}
