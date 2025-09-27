@@ -1,4 +1,4 @@
-/* General container to center content, used in Header, Footer, and pages */
+/* General container (used in header, footer, and pages) */
 .container {
     max-width: 1200px;
     margin-left: auto;
@@ -47,7 +47,7 @@
 .ltext-green {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #10b981; /* Your brand's green color */
+    color: #10b981; /* Brand green */
 }
 
 /* Navigation Styling */
@@ -67,20 +67,62 @@
     color: #10b981;
 }
 
-/* For React Router's NavLink active class */
 .nav-link.active {
     color: #10b981;
     font-weight: 600;
 }
 
+/* Dropdown Menu */
+.dropdown {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
 
-/* Header Right Side Styling */
+.dropdown-arrow {
+    color: #4b5563;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.dropdown-arrow.open {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    min-width: 170px;
+    background: white;
+    border: 2px solid #10b981;
+    border-radius: 6px;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.dropdown-item {
+    padding: 10px 14px;
+    display: block;
+    text-decoration: none;
+    color: #10b981;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #e6f9f0;
+}
+
+/* Header Right Side */
 .header-right {
     display: flex;
     align-items: center;
     gap: 1rem;
 }
 
+/* Search Box */
 .search-box {
     position: relative;
     display: flex;
@@ -96,7 +138,7 @@
 .search-input {
     border: 1px solid #d1d5db;
     border-radius: 8px;
-    padding: 0.6rem 0.75rem 0.6rem 2.5rem; /* Left padding for icon */
+    padding: 0.6rem 0.75rem 0.6rem 2.5rem;
     background-color: #f9fafb;
     width: 250px;
     transition: all 0.2s ease-in-out;
@@ -108,6 +150,7 @@
     box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
 }
 
+/* Buttons */
 .icon-btn {
     background: none;
     border: none;
@@ -125,6 +168,7 @@
     background-color: #f3f4f6;
 }
 
+/* Cart Button */
 .cart-btn {
     display: flex;
     align-items: center;
@@ -160,6 +204,7 @@
     right: -8px;
 }
 
+/* Profile Picture */
 .profile-pic-btn {
     padding: 0;
     border-radius: 50%;

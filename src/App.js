@@ -7,6 +7,7 @@ import GroceryStore from './GroceryStore';
 import Login from './Login';
 import Register from './Register';
 import Verify from './Verify';
+import AddProduct from './AddProduct';
 
 
 const Products = () => <div>Products Page</div>;
@@ -26,7 +27,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/verify" element={<Verify />} />
-          <Route path="/products" element={<Products />} />
+          <Route path="/products/add" element={<AddProduct />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/profile" element={<Profile />} />

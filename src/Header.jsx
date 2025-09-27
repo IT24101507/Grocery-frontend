@@ -1,17 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { ShoppingCart, Search, User } from 'lucide-react';
-import './Header.css'; // We'll create a dedicated CSS file for the header
-import { useAuth } from './useAuth';
+import { ShoppingCart, Search, User, ChevronDown } from 'lucide-react';
+import './Header.css';
+import { useAuth } from './useAuth'; 
 
 const Header = () => {
+    const [cartItems] = useState(0);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+
+    // Hardcoded admin flag (later replace with auth check)
+    const isAdmin = true;
+
+    
     const { isLoggedIn, profilePictureUrl } = useAuth();
-    const [cartItems] = React.useState(0);
+
+    const toggleDropdown = () => {
+        setDropdownOpen(!dropdownOpen);
+    };
 
     return (
         <header className="header">
             <div className="container">
                 <div className="header-content">
+                    
                     {/* Logo */}
                     <Link to="/" className="logo">
                         <div className="logo-icon">
@@ -23,9 +34,28 @@ const Header = () => {
 
                     {/* Navigation */}
                     <nav className="nav">
-                        {/* Use NavLink for active styling */}
                         <NavLink to="/" className="nav-link">Home</NavLink>
-                        <NavLink to="/products" className="nav-link">Products</NavLink>
+                        
+                        {/* Products + Arrow dropdown */}
+                        <div className="dropdown">
+                            <span className="nav-link">Products</span>
+                            <ChevronDown 
+                                size={20} 
+                                className={`dropdown-arrow ${dropdownOpen ? "open" : ""}`} 
+                                onClick={toggleDropdown}
+                            />
+
+                            {dropdownOpen && (
+                                <div className="dropdown-menu">
+                                    {isAdmin && (
+                                        <Link to="/products/add" className="dropdown-item">Add Product</Link>
+                                    )}
+                                    <Link to="/view-products" className="dropdown-item">View Products</Link>
+                                    <Link to="/offers" className="dropdown-item">Special Offers</Link>
+                                </div>
+                            )}
+                        </div>
+
                         <NavLink to="/contact" className="nav-link">Contact</NavLink>
                     </nav>
 
@@ -41,18 +71,7 @@ const Header = () => {
                             />
                         </div>
 
-                        {/* Cart */}
-                        <Link to="/cart" className="cart-btn">
-                            <ShoppingCart size={18} />
-                            <span className="cart-text">Cart</span>
-                            {cartItems > 0 && (
-                                <span className="cart-badge">
-                                    {cartItems}
-                                </span>
-                            )}
-                        </Link>
-
-                        {/* Conditional User Profile/Login Button */}
+                        {/*  User Profile/Login Button merged */}
                         {isLoggedIn ? (
                             <Link to="/profile" className="icon-btn profile-pic-btn">
                                 {profilePictureUrl ? (
@@ -74,6 +93,15 @@ const Header = () => {
                                 <User size={20} />
                             </Link>
                         )}
+
+                        {/* Cart */}
+                        <Link to="/cart" className="cart-btn">
+                            <ShoppingCart size={18} />
+                            <span className="cart-text">Cart</span>
+                            {cartItems > 0 && (
+                                <span className="cart-badge">{cartItems}</span>
+                            )}
+                        </Link>
                     </div>
                 </div>
             </div>
