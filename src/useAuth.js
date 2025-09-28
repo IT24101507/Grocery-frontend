@@ -2,30 +2,27 @@ import { useState, useEffect } from 'react';
 
 export const useAuth = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [profilePictureUrl, setProfilePictureUrl] = useState(null);
 
     useEffect(() => {
         const checkLoginStatus = () => {
             const token = localStorage.getItem('token');
-            const storedProfilePicture = localStorage.getItem('profilePictureUrl');
-            console.log('Auth check - Token:', !!token, 'Profile URL:', storedProfilePicture);
-            console.log('LocalStorage contents:', {
-                token: localStorage.getItem('token'),
-                profilePictureUrl: localStorage.getItem('profilePictureUrl'),
-                allKeys: Object.keys(localStorage)
-            });
+            const username = localStorage.getItem('username');
+            
+            console.log('Auth check - Token exists:', !!token, 'Username:', username);
+            
             if (token) {
                 setIsLoggedIn(true);
-                setProfilePictureUrl(storedProfilePicture);
+                console.log('User is authenticated');
             } else {
                 setIsLoggedIn(false);
-                setProfilePictureUrl(null);
+                console.log('User is not authenticated');
             }
         };
 
         checkLoginStatus();
 
         const handleStorageChange = () => {
+            console.log('Storage change detected, rechecking auth status');
             checkLoginStatus();
         };
 
@@ -38,10 +35,5 @@ export const useAuth = () => {
         };
     }, []);
 
-    // Debug logging whenever state changes
-    useEffect(() => {
-        console.log('Auth state changed - isLoggedIn:', isLoggedIn, 'profilePictureUrl:', profilePictureUrl);
-    }, [isLoggedIn, profilePictureUrl]);
-
-    return { isLoggedIn, profilePictureUrl };
+    return { isLoggedIn };
 };

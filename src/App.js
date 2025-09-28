@@ -7,12 +7,13 @@ import GroceryStore from './GroceryStore';
 import Login from './Login';
 import Register from './Register';
 import Verify from './Verify';
+import Profile from './Profile';
 
 
 const Products = () => <div>Products Page</div>;
 const Contact = () => <div>Contact Page</div>;
 const Cart = () => <div>Cart Page</div>;
-const Profile = () => <div>Profile Page</div>; 
+ 
 
 function App() {
   const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || "919339334239-kl7469709cpapu9dirknf3cml0rafliu.apps.googleusercontent.com";

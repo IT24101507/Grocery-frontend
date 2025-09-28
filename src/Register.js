@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { authAPI } from './api';
 
 // Message Popup Component
 const MessagePopup = ({ isVisible, type, title, message, username, onClose }) => {
@@ -116,7 +116,11 @@ const Register = () => {
     const [gmail, setGmail] = useState('');
     const [password, setPassword] = useState('');
     const [telephone, setTelephone] = useState('');
-    const [address, setAddress] = useState('');
+    const [fullName, setFullName] = useState('');
+    const [addressLine1, setAddressLine1] = useState('');
+    const [addressLine2, setAddressLine2] = useState('');
+    const [city, setCity] = useState('');
+    const [postalCode, setPostalCode] = useState('');
     const [error, setError] = useState('');
     const [popup, setPopup] = useState({ isVisible: false, type: '', title: '', message: '', username: '' });
     const navigate = useNavigate();
@@ -136,15 +140,27 @@ const Register = () => {
         e.preventDefault();
         setError('');
 
-        const newUser = { username, gmail, password, telephone, address, role: 'USER' };
+        const newUser = { 
+            username, 
+            gmail, 
+            password, 
+            telephone, 
+            fullName, 
+            addressLine1, 
+            addressLine2, 
+            city, 
+            postalCode, 
+            role: 'ROLE_CUSTOMER' 
+        };
 
         try {
-            const response = await axios.post('http://localhost:8082/api/auth/register', newUser);
+            const response = await authAPI.register(newUser);
             
-            // Show success popup instead of alert
-            showPopup('success', 'Registration Successful!', 'You have been registered successfully. Please check your email for verification.', username);
+            // Show success popup with username from response
+            showPopup('success', 'Registration Successful!', response.data, username);
 
         } catch (err) {
+            console.error('Registration error:', err);
             if (err.response && err.response.status === 409) {
                 showPopup('error', 'Registration Failed', 'This email address is already registered. Please use a different email or try logging in.');
             } else {
@@ -177,6 +193,18 @@ const Register = () => {
                         placeholder="Choose a username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
+                        required
+                    />
+                </div>
+                <div style={{ marginBottom: '1rem' }}>
+                    <label>Full Name</label>
+                    <input
+                        type="text"
+                        className="search-input"
+                        style={{ width: '100%', padding: '0.75rem', marginTop: '0.25rem', background: '#f3f4f6' }}
+                        placeholder="Enter your full name"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
                         required
                     />
                 </div>
@@ -217,14 +245,49 @@ const Register = () => {
                     />
                 </div>
                 <div style={{ marginBottom: '1rem' }}>
-                    <label>Address</label>
+                    <label>Address Line 1</label>
                     <input
                         type="text"
                         className="search-input"
                         style={{ width: '100%', padding: '0.75rem', marginTop: '0.25rem', background: '#f3f4f6' }}
-                        placeholder="Enter your address"
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
+                        placeholder="Street address, P.O. box, company name, c/o"
+                        value={addressLine1}
+                        onChange={(e) => setAddressLine1(e.target.value)}
+                        required
+                    />
+                </div>
+                <div style={{ marginBottom: '1rem' }}>
+                    <label>Address Line 2</label>
+                    <input
+                        type="text"
+                        className="search-input"
+                        style={{ width: '100%', padding: '0.75rem', marginTop: '0.25rem', background: '#f3f4f6' }}
+                        placeholder="Apartment, suite, unit, building, floor, etc."
+                        value={addressLine2}
+                        onChange={(e) => setAddressLine2(e.target.value)}
+                    />
+                </div>
+                <div style={{ marginBottom: '1rem' }}>
+                    <label>City</label>
+                    <input
+                        type="text"
+                        className="search-input"
+                        style={{ width: '100%', padding: '0.75rem', marginTop: '0.25rem', background: '#f3f4f6' }}
+                        placeholder="Enter your city"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        required
+                    />
+                </div>
+                <div style={{ marginBottom: '1rem' }}>
+                    <label>Postal Code</label>
+                    <input
+                        type="text"
+                        className="search-input"
+                        style={{ width: '100%', padding: '0.75rem', marginTop: '0.25rem', background: '#f3f4f6' }}
+                        placeholder="Enter your postal code"
+                        value={postalCode}
+                        onChange={(e) => setPostalCode(e.target.value)}
                         required
                     />
                 </div>
