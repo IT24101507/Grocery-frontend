@@ -8,6 +8,7 @@ import Login from './Login';
 import Register from './Register';
 import Verify from './Verify';
 import CartPage from './CartPage';
+import CheckoutPage from './CheckoutPage';
 
 
 const Products = () => <div>Products Page</div>;
@@ -30,6 +31,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
         </Route>
       </Routes>
     </Router>

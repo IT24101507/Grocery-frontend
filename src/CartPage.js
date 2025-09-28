@@ -41,7 +41,7 @@ const CartPage = () => {
             return;
         }
 
-        fetch(`http://localhost:8080/api/cart?userId=1`, {
+        fetch(`http://localhost:8080/api/cart?userId=7`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'

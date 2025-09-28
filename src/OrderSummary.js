@@ -1,14 +1,15 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // This component just needs the cart data to display totals
 const OrderSummary = ({ cart }) => {
     // Handle potential missing data
     const total = cart.totalPrice || 0;
     const itemCount = cart.items ? cart.items.reduce((sum, item) => sum + item.quantity, 0) : 0;
+    const navigate = useNavigate();
 
     const handleCheckout = () => {
-        // Checkout logic here
-        alert('Checkout functionality to be implemented');
+        navigate('/checkout');
     };
 
     return (
