@@ -10,11 +10,11 @@ const AddProduct = () => {
   const [displayQuantity, setDisplayQuantity] = useState("");
   const [displayUnit, setDisplayUnit] = useState("");
   const [description, setDescription] = useState("");
-  const [discount, setDiscount] = useState(0);
+  const [discount, setDiscount] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
-  const unitOptions = ["KG", "G", "ML", "L", "PACKET", "BOTTLE", "CAN"];
+  const unitOptions = ["KG", "G", "ML", "L", "PACKET", "BOTTLE", "CAN", "OTHER"];
 
   // Clear one field
   const handleClear = (field) => {
@@ -44,7 +44,7 @@ const AddProduct = () => {
         setDescription("");
         break;
       case "discount":
-        setDiscount(0);
+        setDiscount("");
         break;
       case "imageFile":
         setImageFile(null);
@@ -65,7 +65,7 @@ const AddProduct = () => {
     setDisplayQuantity("");
     setDisplayUnit("");
     setDescription("");
-    setDiscount(0);
+    setDiscount("");
     setImageFile(null);
     setImagePreview(null);
   };
@@ -79,6 +79,12 @@ const AddProduct = () => {
     }
   };
 
+  // Convert safely → empty → 0
+  const safeNumber = (val) => {
+    if (val === "" || val === null || isNaN(val)) return 0;
+    return Number(val);
+  };
+
   // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,13 +92,13 @@ const AddProduct = () => {
     const formData = new FormData();
     formData.append("proName", productName);
     formData.append("category", category);
-    formData.append("price", price);
-    formData.append("stockQuantity", stockQuantity);
+    formData.append("price", safeNumber(price));
+    formData.append("stockQuantity", safeNumber(stockQuantity));
     formData.append("stockUnit", stockUnit);
-    formData.append("displayQuantity", displayQuantity);
+    formData.append("displayQuantity", safeNumber(displayQuantity));
     formData.append("displayUnit", displayUnit);
     formData.append("description", description);
-    formData.append("discount", discount);
+    formData.append("discount", safeNumber(discount));
 
     if (imageFile) {
       formData.append("imageFile", imageFile);
@@ -106,17 +112,17 @@ const AddProduct = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        alert("❌ Failed to add product: " + errorText);
+        alert(" Failed to add product: " + errorText);
         return;
       }
 
       const savedProduct = await response.json();
       console.log("Product added:", savedProduct);
-      alert("✅ Product added successfully!");
+      alert(" Product added successfully!");
       handleClearAll();
     } catch (error) {
       console.error("Error adding product:", error);
-      alert("⚠️ Server error. Check backend logs.");
+      alert(" Server error. Check backend logs.");
     }
   };
 
@@ -137,6 +143,7 @@ const AddProduct = () => {
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
               className="white-input"
+              required
             />
             <button
               type="button"
@@ -153,6 +160,7 @@ const AddProduct = () => {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               className="white-input"
+              required
             >
               <option value="">-- Select Category --</option>
               <option value="vegetables">Vegetables</option>
@@ -162,7 +170,7 @@ const AddProduct = () => {
               <option value="dairy">Dairy</option>
               <option value="meat">Meat</option>
               <option value="sea food">Sea Food</option>
-              <option value="snacks">Snacks</option>
+              <option value="snacks">Snacks & Sweets</option>
             </select>
             <button
               type="button"
@@ -182,6 +190,7 @@ const AddProduct = () => {
               min="0"
               onChange={(e) => setPrice(e.target.value)}
               className="white-input"
+              required
             />
             <button
               type="button"
@@ -227,7 +236,7 @@ const AddProduct = () => {
           </div>
 
           <div className="form-group display-group">
-            <label>Display Quantity (For customers) </label>
+            <label>Display Quantity (For customers)</label>
             <input
               type="number"
               placeholder="Enter display quantity"
@@ -287,7 +296,7 @@ const AddProduct = () => {
               placeholder="0"
               value={discount}
               min="0"
-              onChange={(e) => setDiscount(parseInt(e.target.value) || 0)}
+              onChange={(e) => setDiscount(e.target.value)}
               className="white-input"
             />
             <button
