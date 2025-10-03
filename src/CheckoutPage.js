@@ -37,7 +37,7 @@ const CheckoutPage = () => {
             return;
         }
 
-        fetch(`http://localhost:8080/api/cart?userId=7`, {
+        fetch(`http://localhost:8080/api/cart?userId=1`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
