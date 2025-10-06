@@ -39,6 +39,9 @@ const MessagePopup = ({ isVisible, type, title, message, username, onClose }) =>
 const Login = () => {
     const [gmail, setGmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
+    const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+    const [isSubmittingForgotPassword, setIsSubmittingForgotPassword] = useState(false);
     const [popup, setPopup] = useState({ isVisible: false, type: '', title: '', message: '' });
     const navigate = useNavigate();
     const location = useLocation();
@@ -60,8 +63,46 @@ const Login = () => {
         setPopup({ isVisible: false, type: '', title: '', message: '', username: '' });
         
         if (currentPopupType === 'success') {
-            const destination = location.state?.from || '/';
-            navigate(destination);
+            const userRole = localStorage.getItem('userRole');
+            if (userRole === 'ROLE_ADMIN') {
+                navigate('/admin/dashboard');
+            } else {
+                const destination = location.state?.from || '/';
+                navigate(destination);
+            }
+        }
+    };
+
+    const handleForgotPassword = async (e) => {
+        e.preventDefault();
+        console.log('=== FORGOT PASSWORD REQUEST ===' );
+        console.log('Email:', forgotPasswordEmail);
+        
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(forgotPasswordEmail)) {
+            showPopup('error', 'Invalid Email', 'Please enter a valid email address.');
+            return;
+        }
+        
+        setIsSubmittingForgotPassword(true);
+        
+        try {
+            console.log('Sending forgot password request...');
+            const response = await authAPI.forgotPassword(forgotPasswordEmail);
+            console.log('Forgot password response:', response);
+            
+            showPopup('success', 'Reset Link Sent', response.data);
+            setShowForgotPassword(false);
+            setForgotPasswordEmail('');
+        } catch (error) {
+            console.error('Forgot password error:', error);
+            console.error('Error response:', error.response);
+            
+            const errorMessage = error.response?.data || 'Failed to send reset link. Please try again.';
+            showPopup('error', 'Error', errorMessage);
+        } finally {
+            setIsSubmittingForgotPassword(false);
         }
     };
 
@@ -75,6 +116,7 @@ const Login = () => {
             localStorage.setItem('username', userData.userNickname);
             localStorage.setItem('gmail', userData.gmail);
             localStorage.setItem('token', userData.jwt);
+            localStorage.setItem('userId', userData.userId);
             localStorage.setItem('fullName', userData.fullName);
             localStorage.setItem('addressLine1', userData.addressLine1);
             localStorage.setItem('addressLine2', userData.addressLine2);
@@ -129,6 +171,7 @@ const Login = () => {
                     localStorage.setItem('username', userData.userNickname);
                     localStorage.setItem('gmail', userData.gmail);
                     localStorage.setItem('token', userData.jwt);
+                    localStorage.setItem('userId', userData.userId);
                     localStorage.setItem('fullName', userData.fullName);
                     localStorage.setItem('addressLine1', userData.addressLine1);
                     localStorage.setItem('addressLine2', userData.addressLine2);
@@ -175,6 +218,22 @@ const Login = () => {
                     <div style={{ marginBottom: '1.5rem' }}>
                         <label>Password</label>
                         <input type="password" className="search-input" style={{ width: '100%', padding: '0.75rem', marginTop: '0.25rem', background: '#f3f4f6' }} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                        <div style={{ textAlign: 'right', marginTop: '0.5rem' }}>
+                            <button 
+                                type="button" 
+                                onClick={() => setShowForgotPassword(true)}
+                                style={{ 
+                                    background: 'none', 
+                                    border: 'none', 
+                                    color: '#10b981', 
+                                    fontSize: '0.875rem',
+                                    cursor: 'pointer',
+                                    textDecoration: 'underline'
+                                }}
+                            >
+                                Forgot Password?
+                            </button>
+                        </div>
                     </div>
                     <button type="submit" className="btn-primary" style={{ width: '100%', border: 'none' }}>Login</button>
                     <button type="button" onClick={() => handleGoogleLogin()} className="btn-secondary" style={{ width: '100%', border: 'none', marginTop: '1rem' }}>Sign in with Google</button>
@@ -183,6 +242,77 @@ const Login = () => {
                     </p>
                 </form>
             </div>
+            
+            {/* Forgot Password Modal */}
+            {showForgotPassword && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        backgroundColor: 'white',
+                        padding: '2rem',
+                        borderRadius: '12px',
+                        boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+                        maxWidth: '400px',
+                        width: '90%'
+                    }}>
+                        <h3 style={{ marginBottom: '1rem', textAlign: 'center' }}>Reset Password</h3>
+                        <p style={{ marginBottom: '1.5rem', color: '#6b7280', textAlign: 'center' }}>
+                            Enter your email address and we'll send you a link to reset your password.
+                        </p>
+                        <form onSubmit={handleForgotPassword}>
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <label>Email Address</label>
+                                <input 
+                                    type="email" 
+                                    className="search-input" 
+                                    style={{ width: '100%', padding: '0.75rem', marginTop: '0.25rem', background: '#f3f4f6' }} 
+                                    placeholder="your.email@example.com" 
+                                    value={forgotPasswordEmail} 
+                                    onChange={(e) => setForgotPasswordEmail(e.target.value)} 
+                                    required 
+                                />
+                            </div>
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <button 
+                                    type="button" 
+                                    onClick={() => {
+                                        setShowForgotPassword(false);
+                                        setForgotPasswordEmail('');
+                                    }}
+                                    style={{
+                                        flex: 1,
+                                        padding: '0.75rem',
+                                        border: '1px solid #d1d5db',
+                                        borderRadius: '8px',
+                                        background: 'white',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    type="submit" 
+                                    className="btn-primary" 
+                                    style={{ flex: 1, border: 'none' }}
+                                    disabled={isSubmittingForgotPassword || !forgotPasswordEmail.trim()}
+                                >
+                                    {isSubmittingForgotPassword ? 'Sending...' : 'Send Reset Link'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </>
     );
 }

@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Search, User } from 'lucide-react';
 import './Header.css'; 
 import { useAuth } from './useAuth';
+import { useProducts } from './hooks';
 
 const Header = () => {
     const { isLoggedIn } = useAuth();
     const [cartItems] = useState(0);
     const [profilePictureUrl, setProfilePictureUrl] = useState(null);
     const [hasToken, setHasToken] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const { searchProducts } = useProducts();
+    const navigate = useNavigate();
 
     const checkAuthAndProfile = () => {
         const token = localStorage.getItem('token');
@@ -49,6 +53,14 @@ const Header = () => {
         };
     }, []);
 
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            searchProducts(searchQuery);
+            navigate(`/products?search=${searchQuery}`);
+        }
+    };
+
     return (
         <header className="header">
             <div className="container">
@@ -73,14 +85,16 @@ const Header = () => {
                     {/* Right side */}
                     <div className="header-right">
                         {/* Search */}
-                        <div className="search-box">
-                            <Search size={18} className="search-icon" />
+                        <form onSubmit={handleSearchSubmit} className="search-box">
+                            <Search size={18} className="search-icon" onClick={handleSearchSubmit} />
                             <input
                                 type="text"
                                 placeholder="Search products..."
                                 className="search-input"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                        </div>
+                        </form>
 
                         {/* Cart */}
                         <Link to="/cart" className="cart-btn">

@@ -56,6 +56,8 @@ export const authAPI = {
   login: (credentials) => api.post('/auth/login', credentials),
   register: (userData) => api.post('/auth/register', userData),
   googleLogin: (token) => api.post('/auth/google', { token }),
+  forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
+  resetPassword: (token, newPassword) => api.post('/auth/reset-password', { token, newPassword }),
 };
 
 export const productAPI = {
@@ -64,6 +66,13 @@ export const productAPI = {
   getProductById: (productId) => api.get(`/products/${productId}`),
   searchProducts: (query) => api.get(`/products/search?q=${query}`),
   getDiscountedProducts: () => api.get('/products/discounted'),
+  addProduct: (formData) => api.post('/products', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
+  updateProduct: (productId, productData) => api.put(`/products/${productId}`, productData),
+  deleteProduct: (productId) => api.delete(`/products/${productId}`),
 };
 
 export const userAPI = {
@@ -73,11 +82,19 @@ export const userAPI = {
 };
 
 export const cartAPI = {
-  getCart: () => api.get('/cart'),
-  addToCart: (productId, quantity) => api.post('/cart/add', { productId, quantity }),
-  updateCartItem: (itemId, quantity) => api.put(`/cart/item/${itemId}`, { quantity }),
-  removeFromCart: (itemId) => api.delete(`/cart/item/${itemId}`),
-  clearCart: () => api.delete('/cart/clear'),
+  getCart: (userId = localStorage.getItem('userId')) => api.get(`/cart?userId=${userId}`),
+  addToCart: (productId, quantity = 1, userId = localStorage.getItem('userId')) => api.post(`/cart/add?userId=${userId}`, { productId, quantity }),
+  updateCartItem: (productId, quantity, userId = localStorage.getItem('userId')) => api.put(`/cart/update?userId=${userId}&productId=${productId}&quantity=${quantity}`),
+  removeFromCart: (productId, userId = localStorage.getItem('userId')) => api.delete(`/cart/remove?userId=${userId}&productId=${productId}`),
+  clearCart: (userId = localStorage.getItem('userId')) => api.delete(`/cart/clear?userId=${userId}`),
+};
+
+export const orderAPI = {
+  placeOrder: (orderData) => api.post('/orders/place', orderData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
 };
 
 // Helper function to check if user is authenticated

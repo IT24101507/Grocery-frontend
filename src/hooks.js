@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { productAPI, cartAPI } from './api';
 
 export const useProducts = () => {
@@ -75,88 +75,89 @@ export const useProducts = () => {
 };
 
 export const useCart = () => {
-  const [cartItems, setCartItems] = useState([]);
-  const [cartCount, setCartCount] = useState(0);
+  const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [addingToCart, setAddingToCart] = useState(false);
 
-  const fetchCart = async () => {
+  const fetchCart = useCallback(async (userId) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await cartAPI.getCart();
-      setCartItems(response.data.items || []);
-      setCartCount(response.data.totalItems || 0);
+      const response = await cartAPI.getCart(userId);
+      setCart(response.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch cart');
       console.error('Error fetching cart:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // Empty dependency array for fetchCart
 
-  const addToCart = async (productId, quantity = 1) => {
+  const addToCart = useCallback(async (productId, quantity = 1, userId) => {
+    setAddingToCart(true);
     try {
-      const response = await cartAPI.addToCart(productId, quantity);
-      setCartCount(prevCount => prevCount + quantity);
+      const response = await cartAPI.addToCart(productId, quantity, userId);
+      await fetchCart(userId); // Refresh cart
       return response.data;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to add to cart');
       console.error('Error adding to cart:', err);
       throw err;
+    } finally {
+      setAddingToCart(false);
     }
-  };
+  }, [fetchCart]);
 
-  const updateCartItem = async (itemId, quantity) => {
+  const updateCartItem = useCallback(async (productId, quantity, userId) => {
     try {
-      const response = await cartAPI.updateCartItem(itemId, quantity);
-      await fetchCart(); // Refresh cart data
+      const response = await cartAPI.updateCartItem(productId, quantity, userId);
+      await fetchCart(userId); // Refresh cart
       return response.data;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update cart item');
       console.error('Error updating cart item:', err);
       throw err;
     }
-  };
+  }, [fetchCart]);
 
-  const removeFromCart = async (itemId) => {
+  const removeFromCart = useCallback(async (productId, userId) => {
     try {
-      const response = await cartAPI.removeFromCart(itemId);
-      await fetchCart(); // Refresh cart data
+      const response = await cartAPI.removeFromCart(productId, userId);
+      await fetchCart(userId); // Refresh cart
       return response.data;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to remove from cart');
       console.error('Error removing from cart:', err);
       throw err;
     }
-  };
+  }, [fetchCart]);
 
-  const clearCart = async () => {
+  const clearCart = useCallback(async (userId) => {
     try {
-      const response = await cartAPI.clearCart();
-      setCartItems([]);
-      setCartCount(0);
+      const response = await cartAPI.clearCart(userId);
+      setCart(null); // Clear local cart state
       return response.data;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to clear cart');
       console.error('Error clearing cart:', err);
       throw err;
     }
-  };
+  }, [fetchCart]);
 
   useEffect(() => {
-    // Fetch cart when component mounts
     const token = localStorage.getItem('token');
-    if (token) {
-      fetchCart();
+    const userId = localStorage.getItem('userId');
+    if (token && userId) {
+      fetchCart(userId);
     }
-  }, []);
+  }, [fetchCart]);
 
   return {
-    cartItems,
-    cartCount,
+    cart,
     loading,
     error,
+    addingToCart,
     fetchCart,
     addToCart,
     updateCartItem,
