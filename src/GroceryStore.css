@@ -660,6 +660,26 @@ body {
   }
 }
 
+.page-header {
+    display: flex;
+    justify-content: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.filter-toggle-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    background-color: #10b981;
+    color: white;
+    cursor: pointer;
+}
+
+.filter-toggle-btn:hover {
+    background-color: #059669;
+}
+
 .category-link {
   text-decoration: none;
 }
