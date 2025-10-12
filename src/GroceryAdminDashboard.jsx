@@ -1,6 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { productAPI } from './api';
+import { productAPI, orderAPI } from './api';
+import LoadingAnimation from './LoadingAnimation'; // Import LoadingAnimation
 import './GroceryAdminDashboard.css';
+
+// ===================================================================================
+//  HELPER FUNCTION TO FIX INCONSISTENT IMAGE PATHS
+// ===================================================================================
+const getCorrectImagePath = (path) => {
+  if (!path) {
+    return ''; // Return an empty string for orders that might not have a slip
+  }
+  // This function cleans the path by taking only the filename,
+  // fixing the issue of "uploads/uploads/..." in the URL.
+  const filename = path.replace(/\\/g, '/').split('/').pop();
+  return `http://localhost:8082/uploads/${filename}`;
+};
+// ===================================================================================
+
 
 const AddProduct = ({ onAdd, onCancel }) => {
   const [productName, setProductName] = useState("");
@@ -8,8 +24,10 @@ const AddProduct = ({ onAdd, onCancel }) => {
   const [price, setPrice] = useState("");
   const [stockQuantity, setStockQuantity] = useState("");
   const [stockUnit, setStockUnit] = useState("");
+  const [customStockUnit, setCustomStockUnit] = useState(""); // State for custom stock unit
   const [displayQuantity, setDisplayQuantity] = useState("");
   const [displayUnit, setDisplayUnit] = useState("");
+  const [customDisplayUnit, setCustomDisplayUnit] = useState(""); // State for custom display unit
   const [description, setDescription] = useState("");
   const [discount, setDiscount] = useState("");
   const [imageFile, setImageFile] = useState(null);
@@ -34,12 +52,14 @@ const AddProduct = ({ onAdd, onCancel }) => {
         break;
       case "stockUnit":
         setStockUnit("");
+        setCustomStockUnit("");
         break;
       case "displayQuantity":
         setDisplayQuantity("");
         break;
       case "displayUnit":
         setDisplayUnit("");
+        setCustomDisplayUnit("");
         break;
       case "description":
         setDescription("");
@@ -63,8 +83,10 @@ const AddProduct = ({ onAdd, onCancel }) => {
     setPrice("");
     setStockQuantity("");
     setStockUnit("");
+    setCustomStockUnit("");
     setDisplayQuantity("");
     setDisplayUnit("");
+    setCustomDisplayUnit("");
     setDescription("");
     setDiscount("");
     setImageFile(null);
@@ -93,13 +115,25 @@ const AddProduct = ({ onAdd, onCancel }) => {
     const formData = new FormData();
     formData.append("name", productName);
     formData.append("category", category);
-    formData.append("price", safeNumber(price));
+    formData.append("originalPrice", safeNumber(price));
     formData.append("stockQuantity", safeNumber(stockQuantity));
-    formData.append("stockUnit", stockUnit);
     formData.append("displayQuantity", safeNumber(displayQuantity));
-    formData.append("displayUnit", displayUnit);
     formData.append("description", description);
     formData.append("discount", safeNumber(discount));
+
+    if (stockUnit === "OTHER") {
+      formData.append("stockUnit", "OTHER");
+      formData.append("customStockUnit", customStockUnit);
+    } else {
+      formData.append("stockUnit", stockUnit);
+    }
+
+    if (displayUnit === "OTHER") {
+      formData.append("displayUnit", "OTHER");
+      formData.append("customDisplayUnit", customDisplayUnit);
+    } else {
+      formData.append("displayUnit", displayUnit);
+    }
 
     if (imageFile) {
       formData.append("imageFile", imageFile);
@@ -213,6 +247,15 @@ const AddProduct = ({ onAdd, onCancel }) => {
                 </option>
               ))}
             </select>
+            {stockUnit === "OTHER" && (
+              <input
+                type="text"
+                placeholder="Enter custom unit"
+                value={customStockUnit}
+                onChange={(e) => setCustomStockUnit(e.target.value)}
+                className="white-input"
+              />
+            )}
             <button
               type="button"
               className="clear-btn"
@@ -247,6 +290,15 @@ const AddProduct = ({ onAdd, onCancel }) => {
                 </option>
               ))}
             </select>
+            {displayUnit === "OTHER" && (
+              <input
+                type="text"
+                placeholder="Enter custom unit"
+                value={customDisplayUnit}
+                onChange={(e) => setCustomDisplayUnit(e.target.value)}
+                className="white-input"
+              />
+            )}
             <button
               type="button"
               className="clear-btn"
@@ -356,6 +408,7 @@ const AddProduct = ({ onAdd, onCancel }) => {
 };
 
 const GroceryAdminDashboard = () => {
+  const unitOptions = ["KG", "G", "ML", "L", "PACKET", "BOTTLE", "CAN", "OTHER"];
   const [activeTab, setActiveTab] = useState('overview');
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showEditProduct, setShowEditProduct] = useState(false);
@@ -363,14 +416,56 @@ const GroceryAdminDashboard = () => {
   const [adminName, setAdminName] = useState('Admin');
   const [selectedSlip, setSelectedSlip] = useState(null);
   const [showSlipModal, setShowSlipModal] = useState(false);
+  const [productSearch, setProductSearch] = useState('');
+  const [orderSearch, setOrderSearch] = useState('');
+  const [paymentSlipSearch, setPaymentSlipSearch] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [paymentSlips, setPaymentSlips] = useState([]);
 
   useEffect(() => {
     const userNickname = localStorage.getItem('username');
     if (userNickname) {
       setAdminName(userNickname);
     }
-    fetchProducts();
+    const fetchData = async () => {
+      setLoading(true);
+      await Promise.all([fetchProducts(), fetchOrders(), fetchPaymentSlips()]);
+      setLoading(false);
+    };
+    fetchData();
+
+    const handleOrderPlaced = () => {
+      fetchOrders();
+      fetchPaymentSlips();
+    };
+
+    window.addEventListener('order-placed', handleOrderPlaced);
+
+    return () => {
+      window.removeEventListener('order-placed', handleOrderPlaced);
+    };
   }, []);
+
+  const fetchPaymentSlips = async () => {
+    try {
+      const response = await orderAPI.getOrdersWithTransferSlips();
+      setPaymentSlips(response.data);
+    } catch (error) {
+      console.error('Failed to fetch payment slips:', error);
+    }
+  };
+
+  const fetchOrders = async () => {
+    try {
+      const response = await orderAPI.getAllOrders();
+      setOrders(response.data);
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -381,27 +476,33 @@ const GroceryAdminDashboard = () => {
     }
   };
 
-  const [products, setProducts] = useState([]);
-
-  const [orders] = useState([
-    { id: '#ORD-1001', customer: 'John Doe', date: '2025-10-02', total: 45.99, status: 'Delivered' },
-    { id: '#ORD-1002', customer: 'Jane Smith', date: '2025-10-02', total: 32.50, status: 'Processing' },
-    { id: '#ORD-1003', customer: 'Bob Johnson', date: '2025-10-01', total: 78.20, status: 'Shipped' },
-    { id: '#ORD-1004', customer: 'Alice Brown', date: '2025-10-01', total: 55.40, status: 'Delivered' },
-    { id: '#ORD-1005', customer: 'Charlie Wilson', date: '2025-09-30', total: 91.15, status: 'Delivered' },
-  ]);
-
-  const [paymentSlips] = useState([
-    { id: 1, orderId: '#ORD-1002', customer: 'Jane Smith', uploadDate: '2025-10-02 10:30 AM', amount: 32.50, status: 'Pending', imageUrl: 'https://via.placeholder.com/400x300/10b981/ffffff?text=Payment+Slip' },
-    { id: 2, orderId: '#ORD-1003', customer: 'Bob Johnson', uploadDate: '2025-10-01 03:15 PM', amount: 78.20, status: 'Approved', imageUrl: 'https://via.placeholder.com/400x300/10b981/ffffff?text=Payment+Slip' },
-    { id: 3, orderId: '#ORD-1006', customer: 'Emma Davis', uploadDate: '2025-10-02 11:45 AM', amount: 125.80, status: 'Pending', imageUrl: 'https://via.placeholder.com/400x300/10b981/ffffff?text=Payment+Slip' },
-    { id: 4, orderId: '#ORD-1007', customer: 'Michael Brown', uploadDate: '2025-10-01 09:20 AM', amount: 67.30, status: 'Rejected', imageUrl: 'https://via.placeholder.com/400x300/10b981/ffffff?text=Payment+Slip' },
-  ]);
-
   const handleEditProduct = async () => {
     if (editingProduct) {
       try {
-        await productAPI.updateProduct(editingProduct.id, editingProduct);
+        const formData = new FormData();
+        formData.append("name", editingProduct.name);
+        formData.append("category", editingProduct.category);
+        formData.append("originalPrice", editingProduct.originalPrice);
+        formData.append("discount", editingProduct.discount);
+        formData.append("stockQuantity", editingProduct.stockQuantity);
+        formData.append("displayQuantity", editingProduct.displayQuantity);
+        formData.append("description", editingProduct.description);
+
+        if (editingProduct.stockUnit === "OTHER") {
+          formData.append("stockUnit", "OTHER");
+          formData.append("customStockUnit", editingProduct.customStockUnit);
+        } else {
+          formData.append("stockUnit", editingProduct.stockUnit);
+        }
+
+        if (editingProduct.displayUnit === "OTHER") {
+          formData.append("displayUnit", "OTHER");
+          formData.append("customDisplayUnit", editingProduct.customDisplayUnit);
+        } else {
+          formData.append("displayUnit", editingProduct.displayUnit);
+        }
+
+        await productAPI.updateProduct(editingProduct.id, formData);
         setShowEditProduct(false);
         setEditingProduct(null);
         fetchProducts();
@@ -410,6 +511,28 @@ const GroceryAdminDashboard = () => {
       }
     }
   };
+
+  const handleStatusChange = async (orderId, status) => {
+    try {
+      await orderAPI.updateOrderStatus(orderId, status);
+      // Refresh both orders and payment slips as their status might be linked
+      fetchOrders();
+      fetchPaymentSlips();
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+    }
+  };
+  
+  // ===================================================================================
+  //  FIX: ADDED THE MISSING updateSlipStatus FUNCTION
+  // ===================================================================================
+  const updateSlipStatus = (status) => {
+    if (selectedSlip) {
+      handleStatusChange(selectedSlip.id, status);
+      setShowSlipModal(false);
+    }
+  };
+  // ===================================================================================
 
   const handleDeleteProduct = async (id) => {
     try {
@@ -421,7 +544,7 @@ const GroceryAdminDashboard = () => {
   };
 
   const openEditModal = (product) => {
-    setEditingProduct({...product});
+    setEditingProduct({ ...product, customStockUnit: '', customDisplayUnit: '' });
     setShowEditProduct(true);
   };
 
@@ -430,10 +553,9 @@ const GroceryAdminDashboard = () => {
     setShowSlipModal(true);
   };
 
-  const updateSlipStatus = (status) => {
-    console.log(`Updated slip ${selectedSlip.id} to ${status}`);
-    setShowSlipModal(false);
-  };
+  if (loading) {
+    return <LoadingAnimation />;
+  }
 
   return (
     <div className="dashboard-container">
@@ -442,10 +564,25 @@ const GroceryAdminDashboard = () => {
         <div className="header-content">
           <div className="header-left">
             <div className="logo-container">
-              <svg className="logo-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              <svg
+                className="logo-icon"
+                width="32"
+                height="32"
+                fill="#ffffff"
+                version="1.1"
+                id="Layer_1"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlnsXlink="http://www.w3.org/1999/xlink" 
+                viewBox="-25.6 -25.6 307.20 307.20"
+                enableBackground="new 0 0 256 253"
+                xmlSpace="preserve" 
+                stroke="#ffffff"
+              >
+                <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                  <path d="M143.913,143.858l-18.104,25.013l-11.577-12.578c-1.286-1.429-1.239-3.573,0.143-4.955c1.429-1.286,3.573-1.239,4.955,0.143 l5.86,6.337l13.054-18.009c1.143-1.525,3.287-1.953,4.907-0.81C144.675,140.094,145.056,142.333,143.913,143.858z M171.451,161.486 c2.382,2.287,1.286,6.289-1.858,7.051l-10.958,2.811l3.097,10.863c0.858,3.144-2.096,6.051-5.193,5.193l-10.672-3.049l15.246,30.349 l-12.721-3.621l-3.526,11.768L128,189.214l-16.866,33.636l-3.526-11.768l-12.721,3.621l15.246-30.349l-10.672,3.049 c-3.144,0.858-6.051-2.096-5.193-5.193l3.097-10.863l-10.958-2.811c-3.144-0.762-4.24-4.764-1.858-7.051l8.004-7.861l-8.052-7.861 c-2.382-2.287-1.286-6.289,1.858-7.051l10.958-2.811l-3.097-10.863c-0.858-3.144,2.096-6.051,5.193-5.193l10.863,3.097l2.811-10.958 c0.762-3.144,4.86-4.193,7.051-1.858l7.861,8.099l7.861-8.099c2.239-2.382,6.289-1.239,7.051,1.858l2.811,10.958l10.863-3.097 c3.144-0.858,6.051,2.096,5.193,5.193l-3.097,10.863l10.958,2.811c3.144,0.762,4.24,4.764,1.858,7.051l-8.052,7.861L171.451,161.486 z M155.3,153.624c0-14.579-11.863-26.347-26.347-26.347c-14.579,0-26.347,11.816-26.347,26.394s11.768,26.347,26.347,26.347 S155.3,168.203,155.3,153.624z M2,69c0,13.678,9.625,25.302,22,29.576V233H2v18h252v-18H232V98.554 c12.89-3.945,21.699-15.396,22-29.554v-8H2V69z M65.29,68.346c0,6.477,6.755,31.47,31.727,31.47 c21.689,0,31.202-19.615,31.202-31.47c0,11.052,7.41,31.447,31.464,31.447c21.733,0,31.363-20.999,31.363-31.447 c0,14.425,9.726,26.416,22.954,30.154V233H42V98.594C55.402,94.966,65.29,82.895,65.29,68.346z M222.832,22H223V2H34v20L2,54h252 L222.832,22z"></path>
+                </g>
               </svg>
             </div>
             <div>
@@ -459,11 +596,19 @@ const GroceryAdminDashboard = () => {
           <div className="header-right">
             <div className="date-container">
               <p className="date-label">Today</p>
-              <p className="date-value">Oct 02, 2025</p>
+              <p className="date-value">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
             </div>
             <div className="avatar-circle">
               {adminName.charAt(0).toUpperCase()}
             </div>
+            <button onClick={() => import('./api').then(api => api.logout())} className="bbtn-secondary">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '8px' }}>
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              Sign Out
+            </button>
           </div>
         </div>
       </header>
@@ -548,7 +693,7 @@ const GroceryAdminDashboard = () => {
                     <div className="stat-content">
                       <div>
                         <p className="stat-label">Revenue</p>
-                        <p className="stat-value">$303.24</p>
+                        <p className="stat-value">Rs {orders.filter(order => order.status === 'CONFIRMED').reduce((acc, order) => acc + order.totalPrice, 0).toFixed(2)}</p>
                       </div>
                       <div className="stat-icon green">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -563,7 +708,7 @@ const GroceryAdminDashboard = () => {
                     <div className="stat-content">
                       <div>
                         <p className="stat-label">Low Stock Items</p>
-                        <p className="stat-value">{products.filter(p => p.status === 'Low Stock' || p.status === 'Out of Stock').length}</p>
+                        <p className="stat-value">{products.filter(p => p.stockQuantity < 20).length}</p>
                       </div>
                       <div className="stat-icon red">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -579,14 +724,14 @@ const GroceryAdminDashboard = () => {
                 <div className="alert-section">
                   <h2 className="sssection-title">Stock Alerts</h2>
                   <div className="alert-list">
-                    {products.filter(p => p.status === 'Low Stock' || p.status === 'Out of Stock').map(product => (
+                    {products.filter(p => p.stockQuantity < 20).map(product => (
                       <div key={product.id} className="alert-item">
                         <div>
                           <p className="alert-product-name">{product.name}</p>
                           <p className="alert-category">{product.category}</p>
                         </div>
-                        <span className={`badge ${product.status === 'Out of Stock' ? 'red' : 'yellow'}`}>
-                          {product.stock} units
+                        <span className={`badge ${product.stockQuantity === 0 ? 'red' : 'yellow'}`}>
+                          {product.stockQuantity} units
                         </span>
                       </div>
                     ))}
@@ -600,7 +745,7 @@ const GroceryAdminDashboard = () => {
               <div className="content-card">
                 <div className="card-header">
                   <div className="header-actions">
-                    <h2 className="sssection-title">Product Management</h2>
+                    <h2 className="ssection-title">Product Management</h2>
                     <button onClick={() => setShowAddProduct(true)} className="bbtn-primary">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -611,11 +756,11 @@ const GroceryAdminDashboard = () => {
                   </div>
                   <div className="search-bar-container">
                     <div className="search-bar">
-                      <svg className="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg className="ssearch-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <circle cx="11" cy="11" r="8"></circle>
                         <path d="m21 21-4.35-4.35"></path>
                       </svg>
-                      <input type="text" placeholder="Search products..." className="search-input" />
+                      <input type="text" placeholder="Search products..." className="search-input" value={productSearch} onChange={(e) => setProductSearch(e.target.value)} />
                     </div>
                     <button className="bbtn-secondary">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -638,37 +783,37 @@ const GroceryAdminDashboard = () => {
                         <th>Actions</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {products.map(product => (
-                        <tr key={product.id}>
-                          <td className="font-medium">{product.name}</td>
-                          <td>{product.category}</td>
-                          <td>${product.price.toFixed(2)}</td>
-                          <td>{product.stock}</td>
-                          <td>
-                            <span className={`status-badge ${product.status === 'In Stock' ? 'green' : product.status === 'Low Stock' ? 'yellow' : 'red'}`}>
-                              {product.status}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="action-buttons">
-                              <button onClick={() => openEditModal(product)} className="icon-btn edit">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                </svg>
-                              </button>
-                              <button onClick={() => handleDeleteProduct(product.id)} className="icon-btn delete">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <polyline points="3 6 5 6 21 6"></polyline>
-                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                </svg>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
+                        <tbody>
+                          {products.filter(product => product.name.toLowerCase().includes(productSearch.toLowerCase())).map(product => (
+                            <tr key={product.id}>
+                              <td className="font-medium">{product.name}</td>
+                              <td>{product.category}</td>
+                              <td>Rs {(product.salePrice || 0).toFixed(2)}</td>
+                              <td>{product.stockQuantity}</td>
+                              <td>
+                                <span className={`status-badge ${product.stockQuantity >= 20 ? 'green' : product.stockQuantity > 0 ? 'yellow' : 'red'}`}>
+                                  {product.stockQuantity >= 20 ? 'In Stock' : product.stockQuantity > 0 ? 'Low Stock' : 'Out of Stock'}
+                                </span>
+                              </td>
+                              <td>
+                                <div className="action-buttons">
+                                  <button onClick={() => openEditModal(product)} className="icon-btn edit">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                  </button>
+                                  <button onClick={() => handleDeleteProduct(product.id)} className="icon-btn delete">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                      <polyline points="3 6 5 6 21 6"></polyline>
+                                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
                   </table>
                 </div>
               </div>
@@ -681,13 +826,13 @@ const GroceryAdminDashboard = () => {
                   <h2 className="sssection-title">Order History</h2>
                   <div className="search-bar-container">
                     <div className="search-bar">
-                      <svg className="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg className="ssearch-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <circle cx="11" cy="11" r="8"></circle>
                         <path d="m21 21-4.35-4.35"></path>
                       </svg>
-                      <input type="text" placeholder="Search orders..." className="search-input" />
+                      <input type="text" placeholder="Search orders..." className="search-input" value={orderSearch} onChange={(e) => setOrderSearch(e.target.value)} />
                     </div>
-                    <button className="btn-secondary">
+                    <button className="bbtn-secondary">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                       </svg>
@@ -702,22 +847,31 @@ const GroceryAdminDashboard = () => {
                       <tr>
                         <th>Order ID</th>
                         <th>Customer</th>
+                        <th>Mobile Number</th>
                         <th>Date</th>
                         <th>Total</th>
                         <th>Status</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {orders.map(order => (
+                      {orders.filter(order => `#ORD-${order.id}`.toLowerCase().includes(orderSearch.toLowerCase())).map(order => (
                         <tr key={order.id}>
-                          <td className="font-medium">{order.id}</td>
-                          <td>{order.customer}</td>
-                          <td>{order.date}</td>
-                          <td className="font-medium">${order.total.toFixed(2)}</td>
+                          <td className="font-medium">#ORD-{order.id}</td>
+                          <td>{order.customerName}</td>
+                          <td>{order.mobileNumber}</td>
+                          <td>{new Date(order.orderDate).toLocaleDateString()}</td>
+                          <td className="font-medium">Rs {(order.totalPrice || 0).toFixed(2)}</td>
                           <td>
-                            <span className={`status-badge ${order.status === 'Delivered' ? 'green' : order.status === 'Shipped' ? 'blue' : 'yellow'}`}>
-                              {order.status}
-                            </span>
+                            <select
+                              value={order.status}
+                              onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                              className={`status-badge ${order.status === 'DELIVERED' ? 'green' : order.status === 'CONFIRMED' ? 'blue' : 'yellow'}`}>
+                              <option value="NEW">NEW</option>
+                              <option value="PROCESSING">PROCESSING</option>
+                              <option value="CONFIRMED">CONFIRMED</option>
+                              <option value="DELIVERED">DELIVERED</option>
+                              <option value="CANCELLED">CANCELLED</option>
+                            </select>
                           </td>
                         </tr>
                       ))}
@@ -731,16 +885,16 @@ const GroceryAdminDashboard = () => {
             {activeTab === 'payments' && (
               <div className="content-card">
                 <div className="card-header">
-                  <h2 className="sssection-title">Payment Slips</h2>
+                  <h2 className="ssection-title">Payment Slips</h2>
                   <div className="search-bar-container">
                     <div className="search-bar">
-                      <svg className="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg className="ssearch-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <circle cx="11" cy="11" r="8"></circle>
                         <path d="m21 21-4.35-4.35"></path>
                       </svg>
-                      <input type="text" placeholder="Search payment slips..." className="search-input" />
+                      <input type="text" placeholder="Search payment slips..." className="search-input" value={paymentSlipSearch} onChange={(e) => setPaymentSlipSearch(e.target.value)} />
                     </div>
-                    <button className="btn-secondary">
+                    <button className="bbtn-secondary">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                       </svg>
@@ -750,26 +904,26 @@ const GroceryAdminDashboard = () => {
                 </div>
 
                 <div className="payment-slips-grid">
-                  {paymentSlips.map(slip => (
+                  {paymentSlips.filter(slip => `#ORD-${slip.id}`.toLowerCase().includes(paymentSlipSearch.toLowerCase())).map(slip => (
                     <div key={slip.id} className="payment-slip-card">
                       <div className="slip-image-container">
                         <img 
-                          src={slip.imageUrl} 
+                          src={getCorrectImagePath(slip.transferSlipPath)} 
                           alt="Payment Slip" 
                           className="slip-image"
                           onClick={() => viewPaymentSlip(slip)}
                         />
-                        <span className={`status-badge-absolute ${slip.status === 'Approved' ? 'green' : slip.status === 'Rejected' ? 'red' : 'yellow'}`}>
+                        <span className={`status-badge-absolute ${slip.status === 'CONFIRMED' ? 'green' : slip.status === 'CANCELLED' ? 'red' : 'yellow'}`}>
                           {slip.status}
                         </span>
                       </div>
                       <div className="slip-details">
                         <div className="slip-header">
-                          <h3 className="slip-order-id">{slip.orderId}</h3>
-                          <p className="slip-amount">${slip.amount.toFixed(2)}</p>
+                          <h3 className="slip-order-id">#ORD-{slip.id}</h3>
+                          <p className="slip-amount">Rs {(slip.totalPrice || 0).toFixed(2)}</p>
                         </div>
-                        <p className="slip-customer">{slip.customer}</p>
-                        <p className="slip-date">{slip.uploadDate}</p>
+                        <p className="slip-customer">{slip.customerName} ({slip.mobileNumber})</p>
+                        <p className="slip-date">{new Date(slip.orderDate).toLocaleDateString()}</p>
                         <button onClick={() => viewPaymentSlip(slip)} className="bbtn-primary full-width">
                           View Details
                         </button>
@@ -820,8 +974,8 @@ const GroceryAdminDashboard = () => {
                 <input
                   type="number"
                   step="0.01"
-                  value={editingProduct.price}
-                  onChange={(e) => setEditingProduct({...editingProduct, price: parseFloat(e.target.value)})}
+                  value={editingProduct.originalPrice}
+                  onChange={(e) => setEditingProduct({...editingProduct, originalPrice: parseFloat(e.target.value)})}
                   className="form-input"
                 />
               </div>
@@ -829,8 +983,59 @@ const GroceryAdminDashboard = () => {
                 <label className="form-label">Stock Quantity</label>
                 <input
                   type="number"
-                  value={editingProduct.stock}
-                  onChange={(e) => setEditingProduct({...editingProduct, stock: parseInt(e.target.value)})}
+                  value={editingProduct.stockQuantity}
+                  onChange={(e) => setEditingProduct({...editingProduct, stockQuantity: parseInt(e.target.value)})}
+                  className="form-input"
+                />
+              </div>
+<div className="form-group">
+    <label className="form-label">Stock Unit</label>
+    <select
+        value={editingProduct.stockUnit}
+        onChange={(e) => setEditingProduct({...editingProduct, stockUnit: e.target.value})}
+        className="form-input"
+    >
+        {unitOptions.map((unit) => (
+            <option key={unit} value={unit}>{unit}</option>
+        ))}
+    </select>
+    {editingProduct.stockUnit === 'OTHER' && (
+        <input
+            type="text"
+            placeholder="Enter custom unit"
+            value={editingProduct.customStockUnit}
+            onChange={(e) => setEditingProduct({...editingProduct, customStockUnit: e.target.value})}
+            className="form-input"
+        />
+    )}
+</div>
+<div className="form-group">
+    <label className="form-label">Display Unit</label>
+    <select
+        value={editingProduct.displayUnit}
+        onChange={(e) => setEditingProduct({...editingProduct, displayUnit: e.target.value})}
+        className="form-input"
+    >
+        {unitOptions.map((unit) => (
+            <option key={unit} value={unit}>{unit}</option>
+        ))}
+    </select>
+    {editingProduct.displayUnit === 'OTHER' && (
+        <input
+            type="text"
+            placeholder="Enter custom unit"
+            value={editingProduct.customDisplayUnit}
+            onChange={(e) => setEditingProduct({...editingProduct, customDisplayUnit: e.target.value})}
+            className="form-input"
+        />
+    )}
+</div>
+<div className="form-group">
+                <label className="form-label">Discount (%)</label>
+                <input
+                  type="number"
+                  value={editingProduct.discount}
+                  onChange={(e) => setEditingProduct({...editingProduct, discount: parseInt(e.target.value)})}
                   className="form-input"
                 />
               </div>
@@ -863,40 +1068,40 @@ const GroceryAdminDashboard = () => {
             
             <div className="modal-body">
               <div className="slip-image-full">
-                <img src={selectedSlip.imageUrl} alt="Payment Slip" />
+                <img src={getCorrectImagePath(selectedSlip.transferSlipPath)} alt="Payment Slip" />
               </div>
 
               <div className="slip-detail-grid">
                 <div className="detail-item">
                   <p className="detail-label">Order ID</p>
-                  <p className="detail-value">{selectedSlip.orderId}</p>
+                  <p className="detail-value">#ORD-{selectedSlip.id}</p>
                 </div>
                 <div className="detail-item">
                   <p className="detail-label">Amount</p>
-                  <p className="detail-value amount">${selectedSlip.amount.toFixed(2)}</p>
+                  <p className="detail-value amount">Rs {(selectedSlip.totalPrice || 0).toFixed(2)}</p>
                 </div>
                 <div className="detail-item">
                   <p className="detail-label">Customer</p>
-                  <p className="detail-value">{selectedSlip.customer}</p>
+                  <p className="detail-value">{selectedSlip.customerName} ({selectedSlip.mobileNumber})</p>
                 </div>
                 <div className="detail-item">
                   <p className="detail-label">Upload Date</p>
-                  <p className="detail-value">{selectedSlip.uploadDate}</p>
+                  <p className="detail-value">{new Date(selectedSlip.orderDate).toLocaleDateString()}</p>
                 </div>
                 <div className="detail-item full-width">
                   <p className="detail-label">Status</p>
-                  <span className={`status-badge ${selectedSlip.status === 'Approved' ? 'green' : selectedSlip.status === 'Rejected' ? 'red' : 'yellow'}`}>
+                  <span className={`status-badge ${selectedSlip.status === 'CONFIRMED' ? 'green' : selectedSlip.status === 'CANCELLED' ? 'red' : 'yellow'}`}>
                     {selectedSlip.status}
                   </span>
                 </div>
               </div>
 
-              {selectedSlip.status === 'Pending' && (
+              {selectedSlip.status === 'NEW' && (
                 <div className="modal-actions">
-                  <button onClick={() => updateSlipStatus('Rejected')} className="btn-danger full-width-half">
+                  <button onClick={() => updateSlipStatus('CANCELLED')} className="btn-danger full-width-half">
                     Reject Payment
                   </button>
-                  <button onClick={() => updateSlipStatus('Approved')} className="bbtn-primary full-width-half">
+                  <button onClick={() => updateSlipStatus('CONFIRMED')} className="bbtn-primary full-width-half">
                     Approve Payment
                   </button>
                 </div>
