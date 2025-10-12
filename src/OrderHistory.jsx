@@ -1,78 +1,95 @@
 import React, { useState, useEffect } from 'react';
-import { userAPI } from './api';
-import ProductImage from './ProductImage';
-
-const OrderItem = ({ order }) => {
-  return (
-    <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-        <div>
-          <h4 style={{ margin: 0 }}>Order ID: {order.id}</h4>
-          <p style={{ margin: 0, color: '#666' }}>{new Date(order.orderDate).toLocaleDateString()}</p>
-        </div>
-        <div>
-          <p style={{ margin: 0, fontWeight: 'bold' }}>Total: Rs. {order.totalAmount.toFixed(2)}</p>
-          <p style={{ margin: 0, color: '#666' }}>Status: {order.status}</p>
-        </div>
-      </div>
-      <div>
-        {order.items.map(item => (
-          <div key={item.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <div style={{ width: '60px', height: '60px', marginRight: '1rem', borderRadius: '8px', overflow: 'hidden' }}>
-              <ProductImage productId={item.productId} alt={item.productName} />
-            </div>
-            <div>
-              <p style={{ margin: 0 }}>{item.productName}</p>
-              <p style={{ margin: 0, color: '#666' }}>Quantity: {item.quantity}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+import axios from 'axios';
+import { useAuth } from './useAuth'; 
+import LoadingAnimation from './LoadingAnimation'; 
+import './OrderHistory.css';      
 
 const OrderHistory = () => {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    
+    // Destructure both user and token from your authentication context
+    const { user, token } = useAuth();
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await userAPI.getOrders();
-        setOrders(response.data);
-      } catch (err) {
-        setError(err.response?.data?.message || 'Failed to fetch orders');
-        console.error('Error fetching orders:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    useEffect(() => {
+        // If the user or token is not available, don't attempt to fetch orders.
+        if (!user || !token) {
+            setLoading(false);
+            setError('You must be logged in to view your order history.');
+            return;
+        }
 
-    fetchOrders();
-  }, []);
+        const fetchOrders = async () => {
+            try {
+                // Configure the request headers to include the JWT for authorization
+                const config = {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                };
 
-  if (loading) {
-    return <div>Loading orders...</div>;
-  }
+                // Make the authenticated GET request to your backend endpoint
+                const response = await axios.get(`http://localhost:8082/api/orders/customer/${user.id}`, config);
+                
+                setOrders(response.data);
+            } catch (err) {
+                // Log the detailed error for debugging purposes
+                console.error("Error fetching orders:", err.response ? err.response.data : err.message);
+                setError('Failed to fetch your orders. Please try again later.');
+            } finally {
+        
+                setLoading(false);
+            }
+        };
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+        fetchOrders();
+    }, [user, token]); // The effect runs when user or token changes
 
-  return (
-    <div>
-      <h3 style={{ marginBottom: '1rem' }}>Your Orders</h3>
-      {orders.length === 0 ? (
-        <p>You have no orders.</p>
-      ) : (
-        orders.map(order => <OrderItem key={order.id} order={order} />)
-      )}
-    </div>
-  );
+    // --- Render Logic ---
+
+    
+    if (loading) {
+        return <LoadingAnimation />;
+    }
+
+    // 2. Show an error message if the API call failed
+    if (error) {
+        return <div className="order-history-status error">{error}</div>;
+    }
+
+    // 3. Render the order history table
+    return (
+        <div className="order-history-container">
+            <h2>Your Order History</h2>
+            {orders.length === 0 ? (
+                <p>You have not placed any orders yet.</p>
+            ) : (
+                <table className="order-history-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Total Price</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {orders.map(order => (
+                            <tr key={order.id}>
+                                <td>#{order.id}</td>
+                                <td>{new Date(order.orderDate).toLocaleDateString()}</td>
+                                <td>Rs. {order.totalPrice ? order.totalPrice.toFixed(2) : '0.00'}</td>
+                                <td className={`order-status status-${order.status ? order.status.toLowerCase() : 'unknown'}`}>
+                                    {order.status}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+        </div>
+    );
 };
 
 export default OrderHistory;
