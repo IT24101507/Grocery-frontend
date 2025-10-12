@@ -6,11 +6,11 @@ export const useProducts = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchAllProducts = async () => {
+  const fetchAllProducts = async (filters) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await productAPI.getAllProducts();
+      const response = await productAPI.getAllProducts(filters);
       setProducts(response.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch products');
@@ -109,17 +109,37 @@ export const useCart = () => {
     }
   }, [fetchCart]);
 
-  const updateCartItem = useCallback(async (productId, quantity, userId) => {
+const updateCartItem = async (productId, newQuantity) => {
+    // Guard against running if the cart isn't loaded yet
+    if (!cart) return;
+
+    // 1. Save the current cart state. We need this to revert if the API call fails.
+    const originalCart = { ...cart };
+
+    // 2. Create the new, updated items array on the client side.
+    const updatedItems = cart.items.map(item =>
+        item.productId === productId ? { ...item, quantity: newQuantity } : item
+    );
+    
+    // A helper function to recalculate the total
+    const calculateTotal = (items = []) => {
+        return items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    };
+
+    // 3. Update the UI *immediately* with this new state. This feels instant to the user.
+    setCart({ ...cart, items: updatedItems, total: calculateTotal(updatedItems) });
+
+    // 4. In the background, make the real API call.
     try {
-      const response = await cartAPI.updateCartItem(productId, quantity, userId);
-      await fetchCart(userId); // Refresh cart
-      return response.data;
+        await cartAPI.updateCartItem(productId, newQuantity);
+        // If the call succeeds, we do nothing. The UI is already correct.
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update cart item');
-      console.error('Error updating cart item:', err);
-      throw err;
+        // 5. If the call fails, revert the UI back to the original state and show an error.
+        setError(err.response?.data?.message || 'Failed to update cart item');
+        setCart(originalCart); // This is the crucial rollback step.
+        console.error('Error updating cart item:', err);
     }
-  }, [fetchCart]);
+};
 
   const removeFromCart = useCallback(async (productId, userId) => {
     try {
