@@ -36,7 +36,15 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem }) => {
                 <span className="quantity-display">{itemQuantity}</span>
                 <button 
                     className="quantity-btn"
-                    onClick={() => onUpdateQuantity(item.productId, itemQuantity + 1)}
+                    onClick={() => {
+                        if (itemQuantity >= item.stockQuantity - 1) {
+                            alert(`Only ${item.stockQuantity - 1} items are available in stock. You cannot add more at this time.`);
+                        } else {
+                            onUpdateQuantity(item.productId, itemQuantity + 1);
+                        }
+                    }}
+                    disabled={itemQuantity >= item.stockQuantity - 1}
+                    title={itemQuantity >= item.stockQuantity - 1 ? 'Stock limit exceeded' : 'Increase quantity'} // Add tooltip
                 >
                     +
                 </button>
@@ -49,7 +57,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem }) => {
                 onClick={() => onRemoveItem(item.productId)}
                 title="Remove item from cart"
             >
-                &times; {/* This is a multiplication sign 'X' */}
+                &times; 
             </button>
         </div>
     );
