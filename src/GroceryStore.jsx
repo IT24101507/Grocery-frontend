@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react'; 
 import ProductCard from './ProductCard';
+import ProductDetailsModal from './ProductDetailsModal'; 
 import CategorySlider from './CategorySlider';
 import { useProducts, useCart } from './hooks';
 import { isAuthenticated } from './api';
+import LoadingAnimation from './LoadingAnimation';
 import './GroceryStore.css';
-
-
-
 
 const GroceryStore = () => {
   const { products, loading, error, fetchAllProducts } = useProducts();
@@ -17,6 +16,15 @@ const GroceryStore = () => {
   const [vegetableProducts, setVegetableProducts] = useState([]);
   const [snackProducts, setSnackProducts] = useState([]);
   const { cartCount, addToCart: addToCartAPI, loading: cartLoading } = useCart();
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const handleCardClick = (product) => {
+    setSelectedProduct(product);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedProduct(null);
+  };
 
   // Categories data (this can remain static or be fetched from backend)
   const categories = [
@@ -61,11 +69,7 @@ const GroceryStore = () => {
   };
 
   if (loading && products.length === 0) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-        <div>Loading products...</div>
-      </div>
-    );
+    return <LoadingAnimation />;
   }
 
   return (
@@ -119,7 +123,7 @@ const GroceryStore = () => {
               <ProductCard 
                 key={product.id} 
                 product={product} 
-                onAddToCart={addToCart}
+                onCardClick={handleCardClick} 
               />
             ))}
           </div>
@@ -144,7 +148,7 @@ const GroceryStore = () => {
                           <ProductCard 
                             key={product.id} 
                             product={product} 
-                            onAddToCart={addToCart}
+                            onCardClick={handleCardClick} 
                           />
                         ))}
                       </div>          </div>
@@ -160,7 +164,7 @@ const GroceryStore = () => {
                           <ProductCard 
                             key={product.id} 
                             product={product} 
-                            onAddToCart={addToCart}
+                            onCardClick={handleCardClick} 
                           />
                         ))}
                       </div>          </div>
@@ -176,12 +180,16 @@ const GroceryStore = () => {
                           <ProductCard 
                             key={product.id} 
                             product={product} 
-                            onAddToCart={addToCart}
+                            onCardClick={handleCardClick} 
                           />
                         ))}
                       </div>          </div>
         </div>
       </section>
+      <ProductDetailsModal 
+        product={selectedProduct} 
+        onClose={handleCloseModal} 
+      />
     </>
   );
 };
