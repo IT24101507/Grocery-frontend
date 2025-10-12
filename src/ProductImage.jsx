@@ -6,19 +6,36 @@ const ProductImage = ({ productId, alt, className }) => {
   const [imageUrl, setImageUrl] = useState(null);
 
   useEffect(() => {
+    // A variable to track if the component is still mounted
+    let isMounted = true;
+
     const fetchImage = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`${BASE_URL}/products/${productId}/image`, {
+
+        
+        // Create a config object for the request
+        const config = {
           responseType: 'blob',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const url = URL.createObjectURL(response.data);
-        setImageUrl(url);
+          headers: {}, // Start with empty headers
+        };
+
+        // Only add the Authorization header if a token actually exists
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        
+
+        const response = await axios.get(`${BASE_URL}/products/${productId}/image`, config);
+
+        // Check if the component is still mounted before setting state
+        if (isMounted) {
+          const url = URL.createObjectURL(response.data);
+          setImageUrl(url);
+        }
+
       } catch (error) {
-        console.error('Failed to fetch image:', error);
+        console.error(`Failed to fetch image for product ID ${productId}:`, error);
       }
     };
 
@@ -26,16 +43,17 @@ const ProductImage = ({ productId, alt, className }) => {
       fetchImage();
     }
 
-    // Cleanup the object URL on component unmount
+    // Cleanup function to run when the component is unmounted
     return () => {
+      isMounted = false; // Mark as unmounted
       if (imageUrl) {
-        URL.revokeObjectURL(imageUrl);
+        URL.revokeObjectURL(imageUrl); // Prevent memory leaks
       }
     };
-  }, [productId]);
+  }, [productId]); // The dependency array should only contain productId
 
   if (!imageUrl) {
-    return <div>Loading image...</div>;
+    return <div className={className}>Loading image...</div>;
   }
 
   return <img src={imageUrl} alt={alt} className={className} />;
