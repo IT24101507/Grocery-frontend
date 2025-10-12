@@ -5,6 +5,7 @@ import BankTransferDetails from './BankTransferDetails';
 import CheckoutOrderSummary from './CheckoutOrderSummary';
 import { useCart } from './hooks';
 import { orderAPI } from './api';
+import LoadingAnimation from './LoadingAnimation'; 
 
 const CheckoutPage = () => {
     const { cart, loading, error, fetchCart } = useCart();
@@ -19,7 +20,12 @@ const CheckoutPage = () => {
     });
     const [transferSlip, setTransferSlip] = useState(null);
     const [errors, setErrors] = useState({});
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [orderId, setOrderId] = useState(null);
     const navigate = useNavigate();
+
+    
+    const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -32,18 +38,19 @@ const CheckoutPage = () => {
 
     useEffect(() => {
         if (formData.deliveryMethod === 'home') {
-            const storedStreet = localStorage.getItem('street');
-            const storedCity = localStorage.getItem('city');
-            const storedPostalCode = localStorage.getItem('postalCode');
+            const addressLine1 = localStorage.getItem('addressLine1') || '';
+            const addressLine2 = localStorage.getItem('addressLine2') || '';
+            const storedCity = localStorage.getItem('city') || '';
+            const storedPostalCode = localStorage.getItem('postalCode') || '';
 
-            if (storedStreet || storedCity || storedPostalCode) {
-                setFormData(prev => ({
-                    ...prev,
-                    street: storedStreet || '',
-                    city: storedCity || '',
-                    postalCode: storedPostalCode || ''
-                }));
-            }
+            const street = [addressLine1, addressLine2].filter(Boolean).join(', ');
+
+            setFormData(prev => ({
+                ...prev,
+                street: street,
+                city: storedCity,
+                postalCode: storedPostalCode
+            }));
         }
     }, [formData.deliveryMethod]);
 
@@ -87,8 +94,11 @@ const CheckoutPage = () => {
             return;
         }
 
+    
+        setIsPlacingOrder(true);
+
         const orderDetails = {
-            userId: 1, 
+            userId: localStorage.getItem('userId'), 
             customerName: formData.customerName,
             mobileNumber: formData.mobileNumber,
             paymentMethod: formData.paymentMethod,
@@ -107,16 +117,26 @@ const CheckoutPage = () => {
         }
 
         try {
-            const data = await orderAPI.placeOrder(submissionData);
-            alert(data.message); // "Order placed successfully!"
-            window.location.href = '/thank-you';
+            const response = await orderAPI.placeOrder(submissionData);
+            const orderId = response.data.orderId || Math.floor(Math.random() * 10000);
+            setOrderId(orderId);
+            setShowSuccessModal(true);
         } catch (error) {
             console.error('Failed to place order:', error);
-            alert(`Error: ${error.error || 'Could not place order.'}`);
+            alert(`Error: ${error.response?.data?.error || 'Could not place order.'}`);
+        } finally {
+
+            setIsPlacingOrder(false);
         }
     };
 
-    if (loading) return <div style={{textAlign: 'center', padding: '2rem'}}>Loading checkout...</div>;
+    const closeSuccessModal = () => {
+        setShowSuccessModal(false);
+        fetchCart(); 
+        navigate('/');
+    };
+
+    if (loading) return <LoadingAnimation />;
     if (error) return <div style={{textAlign: 'center', padding: '2rem', color: 'red'}}>Error: {error}</div>;
     if (!cart || !cart.items || cart.items.length === 0) {
         return (
@@ -305,7 +325,37 @@ const CheckoutPage = () => {
                 onPlaceOrder={handleSubmit}
                 formData={formData}
                 errors={errors}
+                isPlacingOrder={isPlacingOrder}
             />
+
+            {showSuccessModal && (
+                <div className="modal-overlay">
+                    <div className="success-modal">
+                        <div className="success-modal-content">
+                            <div className="success-icon">
+                                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <circle cx="12" cy="12" r="10" fill="#4ade80"></circle>
+                                    <path d="M8 12l2 2 4-4" stroke="white" strokeWidth="2" fill="none"></path>
+                                </svg>
+                            </div>
+                            <h2 className="success-title">Order Placed Successfully!</h2>
+                            <p className="success-message">
+                                Thank you for your order. Your order ID is <strong>#{orderId}</strong>.
+                                We'll process your order shortly and send you a confirmation.
+                            </p>
+                            <div className="success-actions">
+                                <button 
+                                    onClick={closeSuccessModal}
+                                    className="success-btn"
+                                >
+                                    Continue
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </main>
     );
 };
