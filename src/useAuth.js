@@ -1,47 +1,58 @@
 import { useState, useEffect } from 'react';
 
 export const useAuth = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [profilePictureUrl, setProfilePictureUrl] = useState(null);
+    // Get initial values from localStorage
+    const initialToken = localStorage.getItem('token');
+    const initialRole = localStorage.getItem('userRole');
+    const initialUserId = localStorage.getItem('userId');
+
+    // --- STATE DEFINITIONS ---
+    const [token, setToken] = useState(initialToken); // ADDED: State for the token
+    const [isLoggedIn, setIsLoggedIn] = useState(!!initialToken);
+    const [userRole, setUserRole] = useState(initialRole);
+    const [user, setUser] = useState(initialUserId ? { id: initialUserId } : null);
 
     useEffect(() => {
-        const checkLoginStatus = () => {
-            const token = localStorage.getItem('token');
-            const storedProfilePicture = localStorage.getItem('profilePictureUrl');
-            console.log('Auth check - Token:', !!token, 'Profile URL:', storedProfilePicture);
-            console.log('LocalStorage contents:', {
-                token: localStorage.getItem('token'),
-                profilePictureUrl: localStorage.getItem('profilePictureUrl'),
-                allKeys: Object.keys(localStorage)
-            });
-            if (token) {
+    
+        const syncAuthStatus = () => {
+            const currentToken = localStorage.getItem('token');
+            const currentRole = localStorage.getItem('userRole');
+            const currentUserId = localStorage.getItem('userId');
+            
+            console.log('Auth sync - Token:', currentToken, 'Role:', currentRole, 'UserID:', currentUserId);
+            
+            if (currentToken && currentUserId) {
                 setIsLoggedIn(true);
-                setProfilePictureUrl(storedProfilePicture);
+                setToken(currentToken); // UPDATE the token state
+                setUserRole(currentRole);
+                setUser({ id: currentUserId });
             } else {
                 setIsLoggedIn(false);
-                setProfilePictureUrl(null);
+                setToken(null); // CLEAR the token state
+                setUserRole(null);
+                setUser(null);
             }
         };
 
-        checkLoginStatus();
+        syncAuthStatus();
 
+        // Listen for changes in other browser tabs or from manual logout/login functions
         const handleStorageChange = () => {
-            checkLoginStatus();
+            console.log('Storage change detected, re-syncing auth status');
+            syncAuthStatus();
         };
 
         window.addEventListener('storage', handleStorageChange);
+        // This custom event is useful if you update localStorage manually in your code
         window.addEventListener('localStorageUpdated', handleStorageChange);
 
+        // Cleanup function to remove listeners
         return () => {
             window.removeEventListener('storage', handleStorageChange);
             window.removeEventListener('localStorageUpdated', handleStorageChange);
         };
-    }, []);
+    }, []); 
 
-    // Debug logging whenever state changes
-    useEffect(() => {
-        console.log('Auth state changed - isLoggedIn:', isLoggedIn, 'profilePictureUrl:', profilePictureUrl);
-    }, [isLoggedIn, profilePictureUrl]);
 
-    return { isLoggedIn, profilePictureUrl };
+    return { isLoggedIn, userRole, user, token };
 };

@@ -7,15 +7,24 @@ import GroceryStore from './GroceryStore';
 import Login from './Login';
 import Register from './Register';
 import Verify from './Verify';
+import ResetPassword from './ResetPassword';
+import Profile from './Profile';
+import CartPage from './CartPage';
+import CheckoutPage from './CheckoutPage';
+import AdminDashboard from './GroceryAdminDashboard';
+import ProtectedRoute from './ProtectedRoute';
+import { useAuth } from './useAuth';
 
 
-const Products = () => <div>Products Page</div>;
+import ProductListPage from './ProductListPage';
+
 const Contact = () => <div>Contact Page</div>;
 const Cart = () => <div>Cart Page</div>;
-const Profile = () => <div>Profile Page</div>; 
+ 
 
 function App() {
   const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || "919339334239-kl7469709cpapu9dirknf3cml0rafliu.apps.googleusercontent.com";
+  const { userRole } = useAuth();
 
   return (
     <GoogleOAuthProvider clientId={googleClientId}>
@@ -26,10 +35,13 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/verify" element={<Verify />} />
-          <Route path="/products" element={<Products />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/products" element={<ProductListPage />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/cart" element={<Cart />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/admin/dashboard" element={<ProtectedRoute isAllowed={userRole === 'ROLE_ADMIN'}><AdminDashboard /></ProtectedRoute>} />
         </Route>
       </Routes>
     </Router>

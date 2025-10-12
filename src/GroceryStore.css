@@ -1,4 +1,4 @@
-/* Reset and Base Styles */
+
 * {
   margin: 0;
   padding: 0;
@@ -348,6 +348,7 @@ body {
 .bg-green-100 { background: #dcfce7; }
 .bg-blue-50 { background: #eff6ff; }
 .bg-red-50 { background: #fef2f2; }
+.bg-purple-100 { background: #e9d5ff; }
 
 /* Products Section */
 .products-section {
@@ -446,7 +447,7 @@ body {
 }
 
 /* This is the actual image tag */
-.product-image img {
+.product-image img, .product-card-image {
   width: 100%;           /* Make the image fill the container's width */
   height: 100%;          /* Make the image fill the container's height */
   object-fit: cover;   /* IMPORTANT: 'contain' fits the whole image without cropping */
@@ -510,6 +511,11 @@ body {
 
 .add-to-cart-btn:hover {
   background: #059669;
+}
+
+.add-to-cart-btn.added {
+  background-color: #28a745;
+  cursor: default;
 }
 
 /* Footer */
@@ -652,6 +658,30 @@ body {
   .category-title {
     font-size: 1.25rem;
   }
+}
+
+.page-header {
+    display: flex;
+    justify-content: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.filter-toggle-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    background-color: #10b981;
+    color: white;
+    cursor: pointer;
+}
+
+.filter-toggle-btn:hover {
+    background-color: #059669;
+}
+
+.category-link {
+  text-decoration: none;
 }
 
 @media (max-width: 480px) {

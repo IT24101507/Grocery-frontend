@@ -1,12 +1,65 @@
-import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Search, User } from 'lucide-react';
-import './Header.css'; // We'll create a dedicated CSS file for the header
+import './Header.css'; 
 import { useAuth } from './useAuth';
+import { useProducts } from './hooks';
 
 const Header = () => {
-    const { isLoggedIn, profilePictureUrl } = useAuth();
-    const [cartItems] = React.useState(0);
+    const { isLoggedIn } = useAuth();
+    const [cartItems] = useState(0);
+    const [profilePictureUrl, setProfilePictureUrl] = useState(null);
+    const [hasToken, setHasToken] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const { searchProducts } = useProducts();
+    const navigate = useNavigate();
+
+    const checkAuthAndProfile = () => {
+        const token = localStorage.getItem('token');
+        const storedProfilePicture = localStorage.getItem('profilePictureUrl');
+        const username = localStorage.getItem('username');
+        
+        console.log('Header Debug:');
+        console.log('- Token exists:', !!token);
+        console.log('- Username:', username);
+        console.log('- ProfilePictureUrl from localStorage:', storedProfilePicture);
+        console.log('- All localStorage keys:', Object.keys(localStorage));
+        
+        setHasToken(!!token);
+        
+        // Show profile picture if we have one stored, regardless of API connection
+        if (storedProfilePicture && 
+            storedProfilePicture !== 'null' && 
+            storedProfilePicture !== 'undefined' && 
+            storedProfilePicture !== null && 
+            storedProfilePicture !== undefined) {
+            console.log('- Setting profile picture URL:', storedProfilePicture);
+            setProfilePictureUrl(storedProfilePicture);
+        } else {
+            console.log('- No valid profile picture found, clearing URL. Found value:', storedProfilePicture);
+            setProfilePictureUrl(null);
+        }
+    };
+
+    useEffect(() => {
+        checkAuthAndProfile();
+        // Listen for storage changes
+        window.addEventListener('storage', checkAuthAndProfile);
+        window.addEventListener('localStorageUpdated', checkAuthAndProfile);
+        
+        return () => {
+            window.removeEventListener('storage', checkAuthAndProfile);
+            window.removeEventListener('localStorageUpdated', checkAuthAndProfile);
+        };
+    }, []);
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            searchProducts(searchQuery);
+            navigate(`/products?search=${searchQuery}`);
+        }
+    };
 
     return (
         <header className="header">
@@ -32,14 +85,16 @@ const Header = () => {
                     {/* Right side */}
                     <div className="header-right">
                         {/* Search */}
-                        <div className="search-box">
-                            <Search size={18} className="search-icon" />
+                        <form onSubmit={handleSearchSubmit} className="search-box">
+                            <Search size={18} className="search-icon" onClick={handleSearchSubmit} />
                             <input
                                 type="text"
                                 placeholder="Search products..."
                                 className="search-input"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                        </div>
+                        </form>
 
                         {/* Cart */}
                         <Link to="/cart" className="cart-btn">
@@ -53,21 +108,25 @@ const Header = () => {
                         </Link>
 
                         {/* Conditional User Profile/Login Button */}
-                        {isLoggedIn ? (
+                        {hasToken ? (
                             <Link to="/profile" className="icon-btn profile-pic-btn">
                                 {profilePictureUrl ? (
                                     <img 
                                         src={profilePictureUrl} 
                                         alt="Profile" 
-                                        className="profile-pic"
+                                        className="profile-picture"
+                                        referrerPolicy="no-referrer"
+                                        onLoad={() => console.log('Profile picture loaded successfully:', profilePictureUrl)}
                                         onError={(e) => {
                                             console.log('Profile picture failed to load:', profilePictureUrl);
-                                            e.target.style.display = 'none';
-                                            e.target.nextSibling.style.display = 'flex';
+                                            setProfilePictureUrl(null);
                                         }}
                                     />
-                                ) : null}
-                                <User size={20} style={{ display: profilePictureUrl ? 'none' : 'flex' }} />
+                                ) : (
+                                    <User size={20} className="profile-icon" />
+                                )}
+                                {/* Debug info */}
+                                {console.log('Rendering profile section - hasToken:', hasToken, 'profilePictureUrl:', profilePictureUrl)}
                             </Link>
                         ) : (
                             <Link to="/login" className="icon-btn">
