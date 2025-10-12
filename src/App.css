@@ -52,3 +52,9 @@
     transform: rotate(360deg);
   }
 }
+
+.product-quantity {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
