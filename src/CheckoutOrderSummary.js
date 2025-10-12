@@ -1,7 +1,7 @@
 import React from 'react';
 import ProductImage from './ProductImage';
 
-const CheckoutOrderSummary = ({ cart, deliveryMethod, onPlaceOrder, formData, errors }) => {
+const CheckoutOrderSummary = ({ cart, deliveryMethod, onPlaceOrder, formData, errors, isPlacingOrder }) => {
     if (!cart) return null;
 
     const deliveryFee = deliveryMethod === 'home' ? 200.00 : 0;
@@ -20,6 +20,9 @@ const CheckoutOrderSummary = ({ cart, deliveryMethod, onPlaceOrder, formData, er
     const hasErrors = Object.keys(errors || {}).length > 0;
     const isFormIncomplete = !formData?.customerName || !formData?.mobileNumber || 
                             (deliveryMethod === 'home' && (!formData?.street || !formData?.city));
+    
+    // --- UPDATE: Combine all disabled conditions, including the new loading state ---
+    const isButtonDisabled = itemCount === 0 || hasErrors || isFormIncomplete || isPlacingOrder;
 
     return (
         <div className="order-summary">
@@ -58,16 +61,17 @@ const CheckoutOrderSummary = ({ cart, deliveryMethod, onPlaceOrder, formData, er
             <button 
                 className="place-order-btn"
                 onClick={handlePlaceOrder}
-                disabled={itemCount === 0 || hasErrors || isFormIncomplete}
+                disabled={isButtonDisabled}
                 style={{
-                    opacity: (itemCount === 0 || hasErrors || isFormIncomplete) ? 0.5 : 1,
-                    cursor: (itemCount === 0 || hasErrors || isFormIncomplete) ? 'not-allowed' : 'pointer'
+                    opacity: isButtonDisabled ? 0.6 : 1,
+                    cursor: isButtonDisabled ? 'not-allowed' : 'pointer'
                 }}
             >
-                Place Order
+                {/* --- UPDATE: Change button text based on loading state --- */}
+                {isPlacingOrder ? 'Placing Order...' : 'Place Order'}
             </button>
             
-            {hasErrors && (
+            {hasErrors && !isPlacingOrder && (
                 <p style={{color: 'red', fontSize: '0.9rem', marginTop: '0.5rem', textAlign: 'center'}}>
                     Please fix form errors before placing order
                 </p>
