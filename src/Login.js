@@ -43,6 +43,10 @@ const Login = () => {
     const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
     const [isSubmittingForgotPassword, setIsSubmittingForgotPassword] = useState(false);
     const [popup, setPopup] = useState({ isVisible: false, type: '', title: '', message: '' });
+    
+    
+    const [isLoading, setIsLoading] = useState(false);
+    
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -78,7 +82,6 @@ const Login = () => {
         console.log('=== FORGOT PASSWORD REQUEST ===' );
         console.log('Email:', forgotPasswordEmail);
         
-        // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(forgotPasswordEmail)) {
             showPopup('error', 'Invalid Email', 'Please enter a valid email address.');
@@ -108,6 +111,8 @@ const Login = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        
+        setIsLoading(true);
         try {
             const response = await authAPI.login({ gmail, password });
             const userData = response.data;
@@ -153,11 +158,16 @@ const Login = () => {
             } else {
                 showPopup('error', 'Login Failed', 'An unexpected error occurred.');
             }
+        } finally {
+             
+            setIsLoading(false);
         }
     };
 
     const handleGoogleLogin = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
+        
+            setIsLoading(true);
             try {
                 const response = await fetch(`${BASE_URL}/auth/google`, {
                     method: 'POST',
@@ -198,6 +208,9 @@ const Login = () => {
                 }
             } catch (error) {
                 showPopup('error', 'Google Login Error', 'An error occurred during Google login.');
+            } finally {
+                
+                setIsLoading(false);
             }
         },
         onError: () => {
@@ -235,8 +248,34 @@ const Login = () => {
                             </button>
                         </div>
                     </div>
-                    <button type="submit" className="btn-primary" style={{ width: '100%', border: 'none' }}>Login</button>
-                    <button type="button" onClick={() => handleGoogleLogin()} className="btn-secondary" style={{ width: '100%', border: 'none', marginTop: '1rem' }}>Sign in with Google</button>
+                    <button 
+                        type="submit" 
+                        className="btn-primary" 
+                        style={{ 
+                            width: '100%', 
+                            border: 'none',
+                            cursor: isLoading ? 'not-allowed' : 'pointer',
+                            opacity: isLoading ? 0.7 : 1
+                        }} 
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Logging In...' : 'Login'}
+                    </button>
+                    <button 
+                        type="button" 
+                        onClick={() => handleGoogleLogin()} 
+                        className="btn-secondary" 
+                        style={{ 
+                            width: '100%', 
+                            border: 'none', 
+                            marginTop: '1rem',
+                            cursor: isLoading ? 'not-allowed' : 'pointer',
+                            opacity: isLoading ? 0.7 : 1
+                        }} 
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Please Wait...' : 'Sign in with Google'}
+                    </button>
                     <p style={{ textAlign: 'center', marginTop: '1rem' }}>
                         Don't have an account? <Link to="/register" style={{ color: '#10b981' }}>Register here</Link>
                     </p>
