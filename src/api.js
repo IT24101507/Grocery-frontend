@@ -1,7 +1,16 @@
 import axios from 'axios';
 
+// Base URL for your backend - use environment variable or default to localhost
+const getBaseURL = () => {
+  if (process.env.REACT_APP_API_BASE_URL) {
+    return process.env.REACT_APP_API_BASE_URL;
+  }
+  // Default to AWS production backend for cases where env var is not set
+  return 'http://ravindrastores-env.eba-ygavm4fr.eu-north-1.elasticbeanstalk.com/api';
+};
+
 // Base URL for your backend
-export const BASE_URL = 'http://localhost:8082/api';
+export const BASE_URL = getBaseURL();
 
 // Create axios instance with default config
 const api = axios.create({
@@ -61,7 +70,15 @@ export const authAPI = {
 };
 
 export const productAPI = {
-  getAllProducts: () => api.get('/products'),
+  getAllProducts: (filters = {}) => {
+    const params = new URLSearchParams();
+    if (filters.category) params.append('category', filters.category);
+    if (filters.minPrice) params.append('minPrice', filters.minPrice);
+    if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
+    if (filters.minDiscount) params.append('minDiscount', filters.minDiscount);
+    if (filters.maxDiscount) params.append('maxDiscount', filters.maxDiscount);
+    return api.get(`/products?${params.toString()}`);
+  },
   getProductsByCategory: (categoryId) => api.get(`/products/category/${categoryId}`),
   getProductById: (productId) => api.get(`/products/${productId}`),
   searchProducts: (query) => api.get(`/products/search?q=${query}`),
@@ -71,7 +88,11 @@ export const productAPI = {
       'Content-Type': 'multipart/form-data',
     },
   }),
-  updateProduct: (productId, productData) => api.put(`/products/${productId}`, productData),
+  updateProduct: (productId, formData) => api.put(`/products/${productId}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
   deleteProduct: (productId) => api.delete(`/products/${productId}`),
 };
 
@@ -90,11 +111,14 @@ export const cartAPI = {
 };
 
 export const orderAPI = {
+  getAllOrders: () => api.get('/orders'),
   placeOrder: (orderData) => api.post('/orders/place', orderData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
   }),
+  updateOrderStatus: (orderId, status) => api.put(`/orders/${orderId}/status?status=${status}`),
+  getOrdersWithTransferSlips: () => api.get('/orders/with-transfer-slips'),
 };
 
 // Helper function to check if user is authenticated

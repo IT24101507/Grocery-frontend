@@ -3,11 +3,16 @@ import { ShoppingCart, Check } from 'lucide-react';
 import { useCart } from './hooks';
 import ProductImage from './ProductImage';
 
-const ProductCard = ({ product, showDiscount = true }) => {
+const ProductCard = ({ product, showDiscount = true, onCardClick }) => {
   const { addToCart, addingToCart } = useCart();
   const [isAdded, setIsAdded] = useState(false);
 
   const handleAddToCart = async () => {
+    if (product.stockQuantity <= 1) {
+      alert('This product is out of stock and cannot be added to the cart.');
+      return;
+    }
+
     try {
       await addToCart(product.id, 1);
       setIsAdded(true);
@@ -18,7 +23,7 @@ const ProductCard = ({ product, showDiscount = true }) => {
   };
 
   return (
-    <div className="product-card">
+    <div className="product-card" onClick={() => onCardClick(product)}>
       {showDiscount && product.discount > 0 && (
         <div className="discount-badge">
           -{product.discount}%
@@ -30,17 +35,19 @@ const ProductCard = ({ product, showDiscount = true }) => {
       <div className="product-info">
         <p className="product-category">{product.category}</p>
         <h3 className="product-name">{product.name}</h3>
+        <p className="product-quantity">{product.displayQuantity} {product.displayUnit === 'OTHER' ? product.customDisplayUnit : product.displayUnit}</p>
         <div className="product-footer">
           <div className="product-price">
-            <span className="current-price">Rs. {product.price}</span>
-            {showDiscount && product.originalPrice && (
-              <span className="original-price">Rs. {product.originalPrice}</span>
+            <span className="current-price">Rs. {product.salePrice}</span>
+            {showDiscount && product.price && (
+              <span className="original-price" style={{textDecoration: 'line-through'}}>Rs. {product.price}</span>
             )}
           </div>
           <button
-            onClick={handleAddToCart}
+            onClick={(e) => { e.stopPropagation(); handleAddToCart(); }}
             className={`add-to-cart-btn ${isAdded ? 'added' : ''}`}
-            disabled={addingToCart || isAdded}
+            disabled={addingToCart || isAdded || product.stockQuantity <= 1} // Disable if out of stock
+            title={product.stockQuantity <= 1 ? 'Stock limit exceeded' : 'Add to cart'} // Add tooltip
           >
             {addingToCart ? (
               'Adding...'

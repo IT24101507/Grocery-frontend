@@ -131,6 +131,10 @@ const Register = () => {
     });
     const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
     const [popup, setPopup] = useState({ isVisible: false, type: '', title: '', message: '', username: '' });
+    
+   
+    const [isLoading, setIsLoading] = useState(false);
+    
     const navigate = useNavigate();
 
     // Password validation function
@@ -180,6 +184,9 @@ const Register = () => {
             return;
         }
 
+        
+        setIsLoading(true);
+
         const newUser = { 
             username, 
             gmail, 
@@ -206,6 +213,9 @@ const Register = () => {
             } else {
                 showPopup('error', 'Registration Error', 'An error occurred during registration. Please try again.');
             }
+        } finally {
+            
+            setIsLoading(false);
         }
     };
 
@@ -401,8 +411,18 @@ const Register = () => {
                     />
                 </div>
                 {error && <p style={{ color: '#ef4444', textAlign: 'center', marginBottom: '1rem' }}>{error}</p>}
-                <button type="submit" className="btn-primary" style={{ width: '100%', border: 'none' }}>
-                    Register
+                <button 
+                    type="submit" 
+                    className="btn-primary" 
+                    style={{ 
+                        width: '100%', 
+                        border: 'none',
+                        cursor: isLoading ? 'not-allowed' : 'pointer',
+                        opacity: isLoading ? 0.7 : 1
+                    }}
+                    disabled={isLoading}
+                >
+                    {isLoading ? 'Registering...' : 'Register'}
                 </button>
                  <p style={{ textAlign: 'center', marginTop: '1rem' }}>
                     Already have an account? <Link to="/login" style={{ color: '#10b981' }}>Login here</Link>

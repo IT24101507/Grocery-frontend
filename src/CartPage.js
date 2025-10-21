@@ -4,6 +4,7 @@ import OrderSummary from './OrderSummary';
 import './Cart.css';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from './hooks'; // Import the useCart hook
+import LoadingAnimation from './LoadingAnimation'; // Import LoadingAnimation
 
 const CartPage = () => {
     const {
@@ -34,7 +35,7 @@ const CartPage = () => {
         }
     };
 
-    if (loading) return <div style={{textAlign: 'center', padding: '2rem'}}>Loading your cart...</div>;
+    if (loading) return <LoadingAnimation />;
     if (error) return <div style={{textAlign: 'center', padding: '2rem', color: 'red'}}>Error: {error}</div>;
     if (!cart || !cart.items || cart.items.length === 0) {
         return (

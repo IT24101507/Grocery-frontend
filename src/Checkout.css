@@ -12,6 +12,34 @@ body {
 
 /* Header */
 .header {
+  background: white;
+  padding: 1rem 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  text-decoration: none;
+}
+
+/* Header */
+.header {
     background: white;
     padding: 1rem 0;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -441,14 +469,14 @@ body {
     }
 }
 
-.ffooter {
+/* .ffooter {
     background: #28a745;
     color: white;
     padding: 3rem 0 1rem;
     margin-top: 4rem;
 } 
 
-.footer-content {
+.ffooter-content {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 2rem;
@@ -457,29 +485,29 @@ body {
     gap: 2rem;
 }
 
-.footer-section h3 {
+.ffooter-section h3 {
     margin-bottom: 1rem;
     font-size: 1.2rem;
 }
 
-.footer-section p, .footer-section a {
+.ffooter-section p, .footer-section a {
     color: rgba(255, 255, 255, 0.9);
     text-decoration: none;
     margin-bottom: 0.5rem;
     display: block;
 }
 
-.footer-section a:hover {
+.ffooter-section a:hover {
     color: white;
 }
 
-.footer-bottom {
+.ffooter-bottom {
     text-align: center;
     padding-top: 2rem;
     margin-top: 2rem;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     color: rgba(255, 255, 255, 0.8);
-}
+} */
 
 @media (max-width: 768px) {
     .main {
@@ -680,4 +708,102 @@ body {
     .bank-info {
         grid-template-columns: 1fr;
     }
+}
+
+/* Success Modal Styles - Added at the end as requested */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.success-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+  animation: modalAppear 0.3s ease-out;
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.success-modal-content {
+  padding: 2.5rem;
+  text-align: center;
+}
+
+.success-icon {
+  margin: 0 auto 1.5rem;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #dcfce7;
+}
+
+.success-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #166534;
+  margin-bottom: 1rem;
+}
+
+.success-message {
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.success-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.success-btn {
+  background: linear-gradient(90deg, #4ade80, #22c55e);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(74, 222, 128, 0.2);
+}
+
+.success-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(74, 222, 128, 0.3);
+}
+
+/* Responsive Design for Modal */
+@media (max-width: 768px) {
+  .success-modal-content {
+    padding: 1.5rem;
+  }
+  
+  .success-title {
+    font-size: 1.25rem;
+  }
 }

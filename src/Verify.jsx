@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import LoadingAnimation from './LoadingAnimation'; // Import your custom animation
 
 // Message Popup Component
 const MessagePopup = ({ isVisible, type, title, message, onClose }) => {
@@ -141,6 +142,12 @@ function Verify() {
     }
   }, [searchParams]);
 
+  // --- UPDATE: Return the full-page animation while verifying ---
+  if (isVerifying) {
+    return <LoadingAnimation />;
+  }
+  
+  // --- This part will only render AFTER the verification is complete ---
   return (
     <>
       <MessagePopup 
@@ -150,6 +157,7 @@ function Verify() {
         message={popup.message}
         onClose={closePopup}
       />
+      {/* This container provides a fallback view in case the popup doesn't render */}
       <div style={{
         maxWidth: '450px',
         margin: '5rem auto',
@@ -159,34 +167,8 @@ function Verify() {
         textAlign: 'center'
       }}>
         <h2>Account Verification</h2>
-        {isVerifying ? (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginTop: '2rem'
-          }}>
-            <div style={{
-              width: '20px',
-              height: '20px',
-              border: '2px solid #10b981',
-              borderTop: '2px solid transparent',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-              marginRight: '10px'
-            }}></div>
-            <p>Verifying your account...</p>
-          </div>
-        ) : (
-          <p>Please check the popup message for verification status.</p>
-        )}
+        <p>Verification process complete. Please see the popup message for the result.</p>
       </div>
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
     </>
   );
 }

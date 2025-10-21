@@ -12,6 +12,8 @@ import Profile from './Profile';
 import CartPage from './CartPage';
 import CheckoutPage from './CheckoutPage';
 import AdminDashboard from './GroceryAdminDashboard';
+import ProtectedRoute from './ProtectedRoute';
+import { useAuth } from './useAuth';
 
 
 import ProductListPage from './ProductListPage';
@@ -22,6 +24,7 @@ const Cart = () => <div>Cart Page</div>;
 
 function App() {
   const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || "919339334239-kl7469709cpapu9dirknf3cml0rafliu.apps.googleusercontent.com";
+  const { userRole } = useAuth();
 
   return (
     <GoogleOAuthProvider clientId={googleClientId}>
@@ -38,7 +41,7 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/dashboard" element={<ProtectedRoute isAllowed={userRole === 'ROLE_ADMIN'}><AdminDashboard /></ProtectedRoute>} />
         </Route>
       </Routes>
     </Router>
