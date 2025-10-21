@@ -6,7 +6,7 @@ const getBaseURL = () => {
     return process.env.REACT_APP_API_BASE_URL;
   }
   // Default to AWS production backend for cases where env var is not set
-  return 'http://ravindrastores-env.eba-ygavm4fr.eu-north-1.elasticbeanstalk.com/api';
+  return 'https://ravindrastores-env.eba-ygavm4fr.eu-north-1.elasticbeanstalk.com/api';
 };
 
 // Base URL for your backend
