@@ -23,7 +23,7 @@ const Cart = () => <div>Cart Page</div>;
  
 
 function App() {
-  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || "919339334239-kl7469709cpapu9dirknf3cml0rafliu.apps.googleusercontent.com";
+  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || "919339334239-5pkf5i0pjpvlvfupk6rga8k4mpp6g4l5.apps.googleusercontent.com";
   const { userRole } = useAuth();
 
   return (
