@@ -6,7 +6,7 @@ const getBaseURL = () => {
     return process.env.REACT_APP_API_BASE_URL;
   }
   // Default to AWS production backend for cases where env var is not set
-  return 'https://api.ravindrastores.shop/api';
+  return 'https://ravindra-stores-backend-f4d3g0a6cbecbgcp.eastasia-01.azurewebsites.net/api';
 };
 
 // Base URL for your backend
