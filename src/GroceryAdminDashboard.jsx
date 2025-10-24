@@ -3,20 +3,13 @@ import { productAPI, orderAPI } from './api';
 import LoadingAnimation from './LoadingAnimation'; // Import LoadingAnimation
 import './GroceryAdminDashboard.css';
 
-// ===================================================================================
-//  HELPER FUNCTION TO FIX INCONSISTENT IMAGE PATHS
-// ===================================================================================
 const getCorrectImagePath = (path) => {
   if (!path) {
     return ''; // Return an empty string for orders that might not have a slip
   }
-  // This function cleans the path by taking only the filename,
-  // fixing the issue of "uploads/uploads/..." in the URL.
-  const filename = path.replace(/\\/g, '/').split('/').pop();
-  return `http://localhost:8082/uploads/${filename}`;
+  // Assume the path is always a full URL from Azure Blob Storage
+  return path;
 };
-// ===================================================================================
-
 
 const AddProduct = ({ onAdd, onCancel }) => {
   const [productName, setProductName] = useState("");
