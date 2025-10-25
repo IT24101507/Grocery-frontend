@@ -160,7 +160,7 @@ const Profile = () => {
         <div style={{
             minHeight: '80vh',
             backgroundColor: '#f8fafc',
-            padding: '2rem 1rem'
+            paddingTop: '2rem'
         }}>
             <div style={{
                 maxWidth: '1200px',
@@ -172,7 +172,8 @@ const Profile = () => {
             }}>
                 {/* Profile Header */}
                 <div style={{
-                    padding: '2rem',
+                    paddingLeft: '2rem',
+                    paddingBottom: '2rem',
                     borderBottom: '1px solid #e5e7eb'
                 }}>
                     <div style={{
@@ -225,7 +226,7 @@ const Profile = () => {
                                 margin: '0 0 1.5rem 0',
                                 fontWeight: '500'
                             }}>
-                                @{getUsername(userInfo.gmail)}
+                                @{getUsername(localStorage.getItem('username'))}
                             </p>
                             
                             {/* Action Buttons */}
@@ -238,7 +239,7 @@ const Profile = () => {
                                     style={{
                                     backgroundColor: '#10b981',
                                     color: 'white',
-                                    padding: '0.75rem 1.5rem',
+                                    padding: '0.75rem 1rem',
                                     border: 'none',
                                     borderRadius: '8px',
                                     fontSize: '1rem',
@@ -256,7 +257,7 @@ const Profile = () => {
                                     style={{
                                     backgroundColor: '#f59e0b',
                                     color: 'white',
-                                    padding: '0.75rem 1.5rem',
+                                    padding: '0.75rem 1rem',
                                     border: 'none',
                                     borderRadius: '8px',
                                     fontSize: '1rem',
@@ -274,7 +275,7 @@ const Profile = () => {
                                     style={{
                                         backgroundColor: '#ef4444',
                                         color: 'white',
-                                        padding: '0.75rem 1.5rem',
+                                        padding: '0.75rem 1rem',
                                         border: 'none',
                                         borderRadius: '8px',
                                         fontSize: '1rem',
@@ -435,7 +436,7 @@ const Profile = () => {
                                     fontWeight: '500',
                                     fontStyle: 'italic'
                                 }}>
-                                    {userInfo.gmail} (Cannot be changed)
+                                    {userInfo.gmail}
                                 </span>
                             ) : (
                                 <span style={{
