@@ -1,0 +1,69 @@
+.rate-us-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.rate-us-popup {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.rate-us-popup h2 {
+    margin-top: 0;
+    color: #333;
+    font-size: 1.8em;
+}
+
+.rate-us-popup p {
+    color: #666;
+    font-size: 1.1em;
+    margin-bottom: 25px;
+}
+
+.rate-us-actions button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+    margin: 0 10px;
+}
+
+.rate-us-actions .btn-primary {
+    background-color: #10b981; /* Green */
+    color: white;
+}
+
+.rate-us-actions .btn-primary:hover {
+    background-color: #059669;
+}
+
+.rate-us-actions .btn-secondary {
+    background-color: #e0e0e0; /* Light grey */
+    color: #333;
+}
+
+.rate-us-actions .btn-secondary:hover {
+    background-color: #c0c0c0;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
