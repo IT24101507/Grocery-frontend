@@ -109,7 +109,7 @@ const Login = () => {
         }
     };
 
-    const handleLogin = async (e) => {
+   const handleLogin = async (e) => {
         e.preventDefault();
         
         setIsLoading(true);
@@ -128,6 +128,8 @@ const Login = () => {
             localStorage.setItem('city', userData.city);
             localStorage.setItem('postalCode', userData.postalCode);
             localStorage.setItem('telephone', userData.telephone);
+            const expirationTime = new Date().getTime() + 3600 * 1000; // 1 hour from now
+            localStorage.setItem('tokenExpiration', expirationTime);
             
             const profileUrl = userData.picture || null;
             if (profileUrl && profileUrl !== 'undefined' && profileUrl !== 'null') {
@@ -164,7 +166,7 @@ const Login = () => {
         }
     };
 
-    const handleGoogleLogin = useGoogleLogin({
+   const handleGoogleLogin = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
         
             setIsLoading(true);
@@ -188,6 +190,8 @@ const Login = () => {
                     localStorage.setItem('city', userData.city);
                     localStorage.setItem('postalCode', userData.postalCode);
                     localStorage.setItem('telephone', userData.telephone);
+                    const expirationTime = new Date().getTime() + 3600 * 1000; // 1 hour from now
+                    localStorage.setItem('tokenExpiration', expirationTime);
                     
                     const profileUrl = userData.picture || null;
                     if (profileUrl && profileUrl !== 'undefined' && profileUrl !== 'null') {
