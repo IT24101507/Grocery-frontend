@@ -102,5 +102,5 @@ const App = ({ userRole, isLoggedIn }) => {
   );
 };
 
-// The default export is now the AppWrapper component.
+// Default export is now the AppWrapper component.
 export default AppWrapper;
