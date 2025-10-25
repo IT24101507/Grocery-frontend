@@ -1,7 +1,16 @@
 import axios from 'axios';
 
+// Base URL for your backend - use environment variable or default to localhost
+const getBaseURL = () => {
+  if (process.env.REACT_APP_API_BASE_URL) {
+    return process.env.REACT_APP_API_BASE_URL;
+  }
+  // Default to AWS production backend for cases where env var is not set
+  return 'https://ravindra-stores-azure-backend-a7crgbdwcba0eweb.southindia-01.azurewebsites.net/api';
+};
+
 // Base URL for your backend
-export const BASE_URL = 'http://localhost:8082/api';
+export const BASE_URL = getBaseURL();
 
 // Create axios instance with default config
 const api = axios.create({

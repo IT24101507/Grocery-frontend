@@ -47,7 +47,7 @@ const ProductCard = ({ product, showDiscount = true, onCardClick }) => {
             onClick={(e) => { e.stopPropagation(); handleAddToCart(); }}
             className={`add-to-cart-btn ${isAdded ? 'added' : ''}`}
             disabled={addingToCart || isAdded || product.stockQuantity <= 1} // Disable if out of stock
-            title={product.stockQuantity <= 1 ? 'Stock limit exceeded' : 'Add to cart'} 
+            title={product.stockQuantity <= 1 ? 'Stock limit exceeded' : 'Add to cart'} // Add tooltip
           >
             {addingToCart ? (
               'Adding...'

@@ -3,16 +3,13 @@ import { productAPI, orderAPI } from './api';
 import LoadingAnimation from './LoadingAnimation'; // Import LoadingAnimation
 import './GroceryAdminDashboard.css';
 
-
 const getCorrectImagePath = (path) => {
   if (!path) {
     return ''; // Return an empty string for orders that might not have a slip
   }
-
-  const filename = path.replace(/\\/g, '/').split('/').pop();
-  return `http://localhost:8082/uploads/${filename}`;
+  // Assume the path is always a full URL from Azure Blob Storage
+  return path;
 };
-
 
 const AddProduct = ({ onAdd, onCancel }) => {
   const [productName, setProductName] = useState("");
@@ -519,12 +516,16 @@ const GroceryAdminDashboard = () => {
     }
   };
   
+  // ===================================================================================
+  //  FIX: ADDED THE MISSING updateSlipStatus FUNCTION
+  // ===================================================================================
   const updateSlipStatus = (status) => {
     if (selectedSlip) {
       handleStatusChange(selectedSlip.id, status);
       setShowSlipModal(false);
     }
   };
+  // ===================================================================================
 
   const handleDeleteProduct = async (id) => {
     try {

@@ -5,7 +5,7 @@ import BankTransferDetails from './BankTransferDetails';
 import CheckoutOrderSummary from './CheckoutOrderSummary';
 import { useCart } from './hooks';
 import { orderAPI } from './api';
-import LoadingAnimation from './LoadingAnimation'; 
+import LoadingAnimation from './LoadingAnimation'; // Ensure this is imported
 
 const CheckoutPage = () => {
     const { cart, loading, error, fetchCart } = useCart();
@@ -24,7 +24,7 @@ const CheckoutPage = () => {
     const [orderId, setOrderId] = useState(null);
     const navigate = useNavigate();
 
-    
+    // --- NEW: State to handle the order submission loading state ---
     const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
     useEffect(() => {
@@ -94,7 +94,7 @@ const CheckoutPage = () => {
             return;
         }
 
-    
+        // --- UPDATE: Set loading to true before the API call ---
         setIsPlacingOrder(true);
 
         const orderDetails = {
@@ -125,7 +125,7 @@ const CheckoutPage = () => {
             console.error('Failed to place order:', error);
             alert(`Error: ${error.response?.data?.error || 'Could not place order.'}`);
         } finally {
-
+            // --- UPDATE: Set loading to false after the call finishes ---
             setIsPlacingOrder(false);
         }
     };

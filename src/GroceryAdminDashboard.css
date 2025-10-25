@@ -31,13 +31,11 @@ overflow-x: hidden;
 }
 
 .header-content {
-  padding: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   max-width: 100%;
   flex-wrap: wrap;
-  gap: 1rem;
 }
 
 .header-left {

@@ -66,8 +66,8 @@ const StyledWrapper = styled.div`
   background-color: #f0f0f0;
 
   .logoContainer {
-    width: 250px;
-    height: 250px;
+    width: 130px;
+    height: 130px;
     border-radius: 50%;
     animation: ${changeColor} 8s ease-in-out infinite;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
@@ -79,7 +79,7 @@ const StyledWrapper = styled.div`
   }
 
   .logo {
-    width: 110px;
+    width: 50px;
     height: auto;
     animation: ${floatAndSpin} 5s ease-in-out infinite;
   }
@@ -92,8 +92,8 @@ const StyledWrapper = styled.div`
   }
 
   .loader-dot {
-    height: 13px;
-    width: 13px; /* Made width and height equal for perfect circles */
+    height: 7px;
+    width: 7px; /* Made width and height equal for perfect circles */
     margin-right: 10px;
     border-radius: 50%; /* Changed to 50% for perfect circles */
     animation: ${loaderpulse} 1.5s infinite ease-in-out;
