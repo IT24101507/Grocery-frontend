@@ -1,0 +1,43 @@
+h1 {
+    font-size: 2rem;
+    padding-top: 40px;
+}
+
+.page-section {
+    margin-top: 2rem;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px; 
+    margin-left: auto;
+    margin-right: auto; 
+    padding-left: 20px;
+    padding-right: 20px;
+    box-sizing: border-box;
+}
+
+.page-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.page-center section {
+    width: 100%;
+    max-width: 720px; 
+    margin-top: 2rem;
+}
+
+/* Add spacing between consecutive sections inside container or page-center */
+.container section + section,
+.page-center section + section {
+    margin-top: 2rem;
+}
+
+.link-text {
+    color: #10b981;
+    text-decoration: none;
+    font-weight: 500;
+}

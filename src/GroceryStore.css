@@ -29,10 +29,15 @@ body {
   font-size: 3.5rem;
 }
 
+.hero-text-green {
+  color: #10b981;
+  font-weight: bold;
+  font-size: 3rem;
+}
+
 .text-green {
   color: #10b981;
   font-weight: bold;
-  font-size: 2rem;
 }
 
 /* Header Styles */
@@ -48,7 +53,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 0;
 }
 
 .logo {
@@ -200,6 +204,7 @@ body {
   font-size: 1.125rem;
   margin-bottom: 2rem;
   line-height: 1.7;
+  font-weight: 500;
 }
 
 .hero-buttons {
@@ -217,6 +222,7 @@ body {
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  text-decoration: none;
 }
 
 .btn-primary:hover {
@@ -232,10 +238,12 @@ body {
   font-weight: 500;
   cursor: pointer;
   transition: border-color 0.3s ease;
+  text-decoration: none;
 }
 
 .btn-secondary:hover {
   border-color: #9ca3af;
+  transform: translateY(-2px);
 }
 
 .hero-image {
@@ -279,7 +287,6 @@ body {
 
 .slider-controls {
   display: flex;
-  gap: 0.5rem;
 }
 
 .slider-btn {
@@ -296,14 +303,6 @@ body {
   background: #e5e7eb;
 }
 
-.categories-container {
-  display: flex;
-  gap: 7rem;
-  overflow-x: auto;
-  padding-bottom: 1rem;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
 
 .categories-container::-webkit-scrollbar {
   display: none;
@@ -394,6 +393,7 @@ body {
   font-weight: 500;
   cursor: pointer;
   transition: color 0.3s ease;
+  text-decoration: none;
 }
 
 .see-all-btn:hover {

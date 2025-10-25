@@ -107,7 +107,7 @@ const CheckoutPage = () => {
                 street: formData.street,
                 city: formData.city,
                 postalCode: formData.postalCode
-            } : null
+            } : {}
         };
         
         const submissionData = new FormData();

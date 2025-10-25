@@ -559,8 +559,6 @@ const GroceryAdminDashboard = () => {
             <div className="logo-container">
               <svg
                 className="logo-icon"
-                width="32"
-                height="32"
                 fill="#ffffff"
                 version="1.1"
                 id="Layer_1"
@@ -580,17 +578,10 @@ const GroceryAdminDashboard = () => {
             </div>
             <div>
               <h1 className="header-title">Welcome, {adminName}!</h1>
-              <p className="header-subtitle">
-                <span className="status-dot"></span>
-                Here's what's happening in your store today.
-              </p>
             </div>
           </div>
           <div className="header-right">
-            <div className="date-container">
-              <p className="date-label">Today</p>
               <p className="date-value">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-            </div>
             <div className="avatar-circle">
               {adminName.charAt(0).toUpperCase()}
             </div>

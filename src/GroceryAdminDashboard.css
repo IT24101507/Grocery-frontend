@@ -22,7 +22,7 @@ overflow-x: hidden;
 
 /* Header Styles */
 .dashboard-header {
-  background: linear-gradient(135deg, #16a34a, #22c55e, #16a34a);
+  background: #10b981;
   color: white;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   position: relative;
@@ -31,13 +31,14 @@ overflow-x: hidden;
 }
 
 .header-content {
-  padding: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   max-width: 100%;
   flex-wrap: wrap;
-  gap: 1rem;
+  padding: 0.75rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
 }
 
 .header-left {
@@ -56,6 +57,8 @@ overflow-x: hidden;
 
 .logo-icon {
   color: white;
+  width: 40px;
+  height: 40px;
 }
 
 .header-title {

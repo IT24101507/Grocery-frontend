@@ -6,9 +6,9 @@ import ProductImage from './ProductImage';
 const CartItem = ({ item, onUpdateQuantity, onRemoveItem }) => {
     // Extract data from API response structure
     const itemName = item.name || 'Unknown Product';
-    const itemPrice = item.lineTotal || 0;
+    const itemPrice = Number(item.lineTotal || 0);
     const itemQuantity = item.quantity || 1;
-    const priceEach = item.priceEach || 0;
+    const priceEach = Number(item.priceEach != null ? item.priceEach : (item.price || 0));
     
     return (
         <div className="cart-item">
@@ -18,7 +18,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem }) => {
             
             <div className="cart-item-details">
                 <h4>{itemName}</h4>
-                <p>Quantity: {itemQuantity}</p>
+                <p className="cart-item-price-line">Rs. {priceEach.toFixed(2)} &times; {itemQuantity} = <strong>Rs. {itemPrice.toFixed(2)}</strong></p>
             </div>
 
             <div className="quantity-controls">
@@ -50,6 +50,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem }) => {
                 </button>
             </div>
 
+            {/* keep a compact price display for quick glance */}
             <span className="cart-item-price">Rs. {itemPrice.toFixed(2)}</span>
 
             <button 

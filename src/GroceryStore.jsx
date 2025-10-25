@@ -81,7 +81,7 @@ const GroceryStore = () => {
             <div className="hero-text">
               <h1 className="hero-title">
                 Your One-Stop Shop<br />
-                                for <span className="ttext-green">Quality Groceries</span>
+                                for <span className="hero-text-green">Quality Groceries</span>
               </h1>
               <p className="hero-description">
                 We offer fresh, high-quality groceries delivered straight to your doorstep.
