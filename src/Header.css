@@ -178,7 +178,7 @@
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #e5e7eb;
+    border: none;
     display: block;
 }
 
