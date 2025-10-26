@@ -182,6 +182,7 @@ body {
 .hero {
   background: white;
   padding: 4rem 0;
+  margin-bottom: 60px;
 }
 
 .hero-content {
