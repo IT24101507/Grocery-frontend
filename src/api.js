@@ -147,4 +147,14 @@ export const logout = () => {
   window.location.href = '/login';
 };
 
+export const reviewAPI = {
+  submitReview: (reviewData) => api.post('/reviews', reviewData),
+  getReviewsByProduct: (productId) => api.get(`/reviews/product/${productId}`),
+  getReviewsByCustomer: (customerId) => api.get(`/reviews/customer/${customerId}`),
+  getAllReviews: () => api.get('/reviews/all'), 
+  updateReview: (reviewId, reviewData) => api.put(`/reviews/${reviewId}`, reviewData),
+  deleteReview: (reviewId, customerId) => api.delete(`/reviews/${reviewId}?customerId=${customerId}`),
+  replyToReview: (reviewId, body) => api.put(`/reviews/admin/reply/${reviewId}`, body),
+};
+
 export default api;

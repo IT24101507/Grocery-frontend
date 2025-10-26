@@ -181,7 +181,8 @@ body {
 /* Hero Section */
 .hero {
   background: white;
-  padding: 4rem 0;
+  padding: 6rem 0;
+  margin-bottom: 0px;
 }
 
 .hero-content {
@@ -266,6 +267,7 @@ body {
 /* Categories Section */
 .categories-section {
   padding: 4rem 0;
+  background: white;
 }
 
 .category-slider {

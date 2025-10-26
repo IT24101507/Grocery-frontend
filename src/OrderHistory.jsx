@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from './useAuth'; 
-import LoadingAnimation from './LoadingAnimation'; 
 import './OrderHistory.css';      
 
 const OrderHistory = () => {
@@ -46,12 +45,7 @@ const OrderHistory = () => {
         fetchOrders();
     }, [user, token]); // The effect runs when user or token changes
 
-    // --- Render Logic ---
-
-    
-    if (loading) {
-        return <LoadingAnimation />;
-    }
+    // --- Render Logic -
 
     // 2. Show an error message if the API call failed
     if (error) {
