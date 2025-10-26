@@ -22,10 +22,9 @@ const Footer = () => {
                     <div className="footer-section">
                         <h4 className="footer-title">Shop</h4>
                         <ul className="footer-links">
-                            <li><a href="#">About Us</a></li>
+                            <li><Link to="/about">About Us</Link></li>
                             <li><Link to="/products">All Products</Link></li>
-                            <li><a href="#">FAQ</a></li>
-                            <li><a href="#">Contact us</a></li>
+                            <li><Link to="/contact">Contact us</Link></li>
                         </ul>
                     </div>
 
@@ -33,17 +32,17 @@ const Footer = () => {
                         <h4 className="footer-title">Services</h4>
                         <ul className="footer-links">
                             <li><Link to="/profile">My account</Link></li>
-                            <li><a href="#">Terms & Conditions</a></li>
-                            <li><a href="#">Privacy Policy</a></li>
+                            <li><Link to="/terms">Terms & Conditions</Link></li>
+                            <li><Link to="/privacy">Privacy Policy</Link></li>
                         </ul>
                     </div>
 
                     <div className="footer-section">
                         <h4 className="footer-title">Contact</h4>
                         <ul className="footer-contact">
-                            <li>📍 SLIIT Malabe</li>
-                            <li>📞 0762294533</li>
-                            <li>✉️ contact @ravindrastoreslk@gmail.com</li>
+                            <li>SLIIT Malabe</li>
+                            <li>0762294533</li>
+                            <li>ravindrastoreslk@gmail.com</li>
                         </ul>
                     </div>
                 </div>

@@ -17,13 +17,14 @@ import { useAuth } from './useAuth';
 
 
 import ProductListPage from './ProductListPage';
-
-const Contact = () => <div>Contact Page</div>;
-const Cart = () => <div>Cart Page</div>;
+import About from './About';
+import ContactUs from './ContactUs';
+import Terms from './Terms';
+import Privacy from './Privacy';
  
 
 function App() {
-  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || "919339334239-kl7469709cpapu9dirknf3cml0rafliu.apps.googleusercontent.com";
+  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || "919339334239-5pkf5i0pjpvlvfupk6rga8k4mpp6g4l5.apps.googleusercontent.com";
   const { userRole } = useAuth();
 
   return (
@@ -37,7 +38,10 @@ function App() {
           <Route path="/verify" element={<Verify />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/products" element={<ProductListPage />} />
-          <Route path="/contact" element={<Contact />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/profile" element={<Profile />} />

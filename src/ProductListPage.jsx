@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import ProductDetailsModal from './ProductDetailsModal'; 
 import ProductFilter from './ProductFilter'; 
@@ -12,8 +12,37 @@ const ProductListPage = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [title, setTitle] = useState('All Products');
   const location = useLocation();
+  const navigate = useNavigate();
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const searchQuery = params.get('search');
+    const category = params.get('category');
+    const minPrice = params.get('minPrice');
+    const maxPrice = params.get('maxPrice');
+    const minDiscount = params.get('minDiscount');
+    const maxDiscount = params.get('maxDiscount');
+
+    if (searchQuery) {
+      searchProducts(searchQuery);
+    } else {
+      fetchAllProducts({ category, minPrice, maxPrice, minDiscount, maxDiscount });
+    }
+
+    let newTitle = 'All Products';
+    if (category) {
+      newTitle = category;
+    } else if (searchQuery) {
+      newTitle = `Search results for "${searchQuery}"`;
+    }
+    setTitle(newTitle);
+  }, [location.search]);
+
+  useEffect(() => {
+    setFilteredProducts(products);
+  }, [products]);
 
   const handleCardClick = (product) => {
     setSelectedProduct(product);
@@ -24,39 +53,16 @@ const ProductListPage = () => {
   };
 
   const handleFilter = (filters) => {
-    fetchAllProducts(filters);
+    const params = new URLSearchParams(location.search);
+    Object.keys(filters).forEach(key => {
+      if (filters[key]) {
+        params.set(key, filters[key]);
+      } else {
+        params.delete(key);
+      }
+    });
+    navigate(`/products?${params.toString()}`);
   };
-
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const searchQuery = params.get('search');
-
-    if (searchQuery) {
-      searchProducts(searchQuery);
-    } else {
-      fetchAllProducts();
-    }
-  }, [location.search]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const categoryName = params.get('category');
-    const discounted = params.get('discounted');
-    const searchQuery = params.get('search');
-
-    let newTitle = 'All Products';
-
-    if (categoryName) {
-      newTitle = categoryName;
-    } else if (discounted) {
-      newTitle = 'Discounted Products';
-    } else if (searchQuery) {
-      newTitle = `Search results for "${searchQuery}"`;
-    }
-
-    setTitle(newTitle);
-    setFilteredProducts(products);
-  }, [location.search, products]);
 
   if (loading) {
     return <LoadingAnimation />;

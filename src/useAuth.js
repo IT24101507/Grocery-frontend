@@ -10,10 +10,11 @@ export const useAuth = () => {
     const [token, setToken] = useState(initialToken); // ADDED: State for the token
     const [isLoggedIn, setIsLoggedIn] = useState(!!initialToken);
     const [userRole, setUserRole] = useState(initialRole);
+    // IMPROVED: Initialize user as null if no userId exists
     const [user, setUser] = useState(initialUserId ? { id: initialUserId } : null);
 
     useEffect(() => {
-    
+        // This function syncs the auth state with localStorage.
         const syncAuthStatus = () => {
             const currentToken = localStorage.getItem('token');
             const currentRole = localStorage.getItem('userRole');
@@ -51,8 +52,9 @@ export const useAuth = () => {
             window.removeEventListener('storage', handleStorageChange);
             window.removeEventListener('localStorageUpdated', handleStorageChange);
         };
-    }, []); 
+    }, []); // Empty dependency array means this runs once on mount
 
-
+    // --- RETURN STATEMENT ---
+    // ADD token to the returned object
     return { isLoggedIn, userRole, user, token };
 };

@@ -19,7 +19,7 @@ const ProductFilter = ({ onFilter }) => {
     };
 
     return (
-        <div className="pproduct-filter">
+        <div className="product-filter">
             <select value={category} onChange={(e) => setCategory(e.target.value)}>
                 <option value="">All Categories</option>
                 <option value="vegetables">Vegetables</option>

@@ -241,7 +241,7 @@ const Login = () => {
                                     color: '#10b981', 
                                     fontSize: '0.875rem',
                                     cursor: 'pointer',
-                                    textDecoration: 'underline'
+                                    textDecoration: 'none'
                                 }}
                             >
                                 Forgot Password?
@@ -267,7 +267,7 @@ const Login = () => {
                         className="btn-secondary" 
                         style={{ 
                             width: '100%', 
-                            border: 'none', 
+                            border: ' 1px solid #d3d3d3', 
                             marginTop: '1rem',
                             cursor: isLoading ? 'not-allowed' : 'pointer',
                             opacity: isLoading ? 0.7 : 1
@@ -277,7 +277,7 @@ const Login = () => {
                         {isLoading ? 'Please Wait...' : 'Sign in with Google'}
                     </button>
                     <p style={{ textAlign: 'center', marginTop: '1rem' }}>
-                        Don't have an account? <Link to="/register" style={{ color: '#10b981' }}>Register here</Link>
+                        Don't have an account? <Link to="/register" style={{ color: '#10b981', textDecoration: 'none' }}>Register here</Link>
                     </p>
                 </form>
             </div>

@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react'; 
 import ProductCard from './ProductCard';
-import ProductDetailsModal from './ProductDetailsModal'; 
+import ProductDetailsModal from './ProductDetailsModal'; // Import the modal
 import CategorySlider from './CategorySlider';
 import { useProducts, useCart } from './hooks';
 import { isAuthenticated } from './api';
-import LoadingAnimation from './LoadingAnimation';
+import LoadingAnimation from './LoadingAnimation'; // Import LoadingAnimation
 import './GroceryStore.css';
 
 const GroceryStore = () => {
@@ -81,7 +81,7 @@ const GroceryStore = () => {
             <div className="hero-text">
               <h1 className="hero-title">
                 Your One-Stop Shop<br />
-                                for <span className="ttext-green">Quality Groceries</span>
+                                for <span className="hero-text-green">Quality Groceries</span>
               </h1>
               <p className="hero-description">
                 We offer fresh, high-quality groceries delivered straight to your doorstep.
@@ -123,7 +123,7 @@ const GroceryStore = () => {
               <ProductCard 
                 key={product.id} 
                 product={product} 
-                onCardClick={handleCardClick} 
+                onCardClick={handleCardClick} // Pass the click handler
               />
             ))}
           </div>
@@ -148,7 +148,7 @@ const GroceryStore = () => {
                           <ProductCard 
                             key={product.id} 
                             product={product} 
-                            onCardClick={handleCardClick} 
+                            onCardClick={handleCardClick} // Pass the click handler
                           />
                         ))}
                       </div>          </div>
@@ -164,7 +164,7 @@ const GroceryStore = () => {
                           <ProductCard 
                             key={product.id} 
                             product={product} 
-                            onCardClick={handleCardClick} 
+                            onCardClick={handleCardClick} // Pass the click handler
                           />
                         ))}
                       </div>          </div>
@@ -180,7 +180,7 @@ const GroceryStore = () => {
                           <ProductCard 
                             key={product.id} 
                             product={product} 
-                            onCardClick={handleCardClick} 
+                            onCardClick={handleCardClick} // Pass the click handler
                           />
                         ))}
                       </div>          </div>

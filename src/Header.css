@@ -11,7 +11,6 @@
 .header {
     background-color: #fff;
     border-bottom: 1px solid #e5e7eb;
-    padding: 1rem 0;
     position: sticky;
     top: 0;
     z-index: 50;
@@ -34,8 +33,8 @@
 }
 
 .logo-icon img {
-    height: 40px;
-    width: 40px;
+    height: 32px;
+    width: 32px;
 }
 
 .logo-text {
@@ -96,9 +95,9 @@
 .search-input {
     border: 1px solid #d1d5db;
     border-radius: 8px;
-    padding: 0.6rem 0.75rem 0.6rem 2.5rem; /* Left padding for icon */
+    padding: 0.4rem 0.6rem 0.4rem 2rem; /* Left padding for icon (reduced) */
     background-color: #f9fafb;
-    width: 250px;
+    width: 200px;
     transition: all 0.2s ease-in-out;
 }
 
@@ -113,7 +112,7 @@
     border: none;
     cursor: pointer;
     color: #4b5563;
-    padding: 0.5rem;
+    padding: 0.35rem; /* slightly smaller hit area for compact header */
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -131,7 +130,7 @@
     gap: 0.5rem;
     background-color: #10b981;
     color: white;
-    padding: 0.6rem 1.25rem;
+    padding: 0.45rem 1rem;
     border-radius: 8px;
     border: none;
     font-weight: 500;
@@ -149,22 +148,22 @@
     background-color: #ef4444;
     color: white;
     border-radius: 50%;
-    font-size: 0.75rem;
-    width: 20px;
-    height: 20px;
+    font-size: 0.7rem;
+    width: 18px;
+    height: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
     position: absolute;
-    top: -8px;
-    right: -8px;
+    top: -6px;
+    right: -6px;
 }
 
 .profile-pic-btn {
     padding: 0;
     border-radius: 50%;
-    width: 52px;
-    height: 52px;
+    width: 40px;
+    height: 40px;
     overflow: hidden;
     border: 2px solid #e5e7eb;
     cursor: pointer;
@@ -184,8 +183,8 @@
 }
 
 .profile-icon {
-    width: 26px;
-    height: 26px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     color: #333;
     display: block;

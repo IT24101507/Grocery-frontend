@@ -117,17 +117,24 @@ const updateCartItem = async (productId, newQuantity) => {
     const originalCart = { ...cart };
 
     // 2. Create the new, updated items array on the client side.
-    const updatedItems = cart.items.map(item =>
-        item.productId === productId ? { ...item, quantity: newQuantity } : item
-    );
-    
-    // A helper function to recalculate the total
-    const calculateTotal = (items = []) => {
-        return items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    };
+  const updatedItems = cart.items.map(item => {
+    if (item.productId !== productId) return item;
 
-    // 3. Update the UI *immediately* with this new state. This feels instant to the user.
-    setCart({ ...cart, items: updatedItems, total: calculateTotal(updatedItems) });
+    // Determine unit price: prefer priceEach (from server) then price
+    const unitPrice = (item.priceEach != null && item.priceEach !== '') ? item.priceEach : (item.price || 0);
+    const newLineTotal = Number((unitPrice * newQuantity).toFixed(2));
+
+    return { ...item, quantity: newQuantity, lineTotal: newLineTotal, priceEach: unitPrice };
+  });
+
+  // A helper function to recalculate the totalPrice
+  const calculateTotalPrice = (items = []) => {
+    return items.reduce((acc, it) => acc + (Number(it.lineTotal || (it.priceEach || it.price || 0) * it.quantity) || 0), 0);
+  };
+
+  // 3. Update the UI *immediately* with this new state. This feels instant to the user.
+  const newTotalPrice = Number(calculateTotalPrice(updatedItems).toFixed(2));
+  setCart({ ...cart, items: updatedItems, totalPrice: newTotalPrice });
 
     // 4. In the background, make the real API call.
     try {

@@ -1,0 +1,45 @@
+.category-slider {
+  width: 100%;
+}
+
+.slider-title {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+}
+
+.slider-body {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+}
+
+.slider-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 20;
+  pointer-events: auto;
+}
+
+.slider-btn.left {
+  margin-right: 1.2rem;
+}
+
+.slider-btn.right {
+  margin-left: 1rem;
+}
+
+.categories-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 0.5rem 0;
+  gap: 5rem;
+  flex: 1;
+}

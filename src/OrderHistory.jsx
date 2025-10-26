@@ -30,7 +30,7 @@ const OrderHistory = () => {
                 };
 
                 // Make the authenticated GET request to your backend endpoint
-                const response = await axios.get(`http://localhost:8082/api/orders/customer/${user.id}`, config);
+                const response = await axios.get(`https://ravindra-stores-azure-backend-a7crgbdwcba0eweb.southindia-01.azurewebsites.net/api/orders/customer/${user.id}`, config);
                 
                 setOrders(response.data);
             } catch (err) {
