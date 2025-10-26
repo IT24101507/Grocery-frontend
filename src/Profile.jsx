@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { userAPI } from './api';
 import OrderHistory from './OrderHistory';
+import ReviewPage from './ReviewPage'; // New component for reviews
 
 const Profile = () => {
     const [userInfo, setUserInfo] = useState({
         fullName: '',
         gmail: '',
-        telephone: '', 
+        telephone: '',
         addressLine1: '',
         addressLine2: '',
         city: '',
@@ -15,11 +16,13 @@ const Profile = () => {
     });
     const [profilePicture, setProfilePicture] = useState('');
     const [showOrderHistory, setShowOrderHistory] = useState(false);
+    const [showReviews, setShowReviews] = useState(false); // New state for reviews
     const [isEditMode, setIsEditMode] = useState(false);
     const [editFormData, setEditFormData] = useState({});
     const [loading, setLoading] = useState(false);
     const [updateMessage, setUpdateMessage] = useState('');
     const navigate = useNavigate();
+    const location = useLocation(); // location is needed for the new feature
 
     useEffect(() => {
         // Check if user is logged in
@@ -52,7 +55,14 @@ const Profile = () => {
         setUserInfo(userData);
         setEditFormData(userData);
         setProfilePicture(profileUrl);
-    }, [navigate]);
+
+        // New Feature: Check if navigated from "Rate Us" popup
+        if (location.state?.initialTab === 'myReviews') {
+            setShowReviews(true);
+            setShowOrderHistory(false);
+        }
+
+    }, [navigate, location.state]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -88,7 +98,6 @@ const Profile = () => {
                 postalCode: editFormData.postalCode !== 'Not provided' ? editFormData.postalCode : ''
             };
 
-            // Call backend API to update profile
             const response = await userAPI.updateProfile(updateData);
             
             // Update localStorage with new data
@@ -114,7 +123,6 @@ const Profile = () => {
             setIsEditMode(false);
             setUpdateMessage('Profile updated successfully!');
             
-            // Dispatch event to update other components
             window.dispatchEvent(new Event('localStorageUpdated'));
             
         } catch (error) {
@@ -137,22 +145,10 @@ const Profile = () => {
 
     const handleSignOut = () => {
         // Clear all user data from localStorage
-        localStorage.removeItem('userRole');
-        localStorage.removeItem('username');
-        localStorage.removeItem('gmail');
-        localStorage.removeItem('token');
-        localStorage.removeItem('fullName');
-        localStorage.removeItem('telephone');
-        localStorage.removeItem('addressLine1');
-        localStorage.removeItem('addressLine2');
-        localStorage.removeItem('city');
-        localStorage.removeItem('postalCode');
-        localStorage.removeItem('profilePictureUrl');
+        localStorage.clear();
         
-        // Dispatch event to update other components
         window.dispatchEvent(new Event('localStorageUpdated'));
         
-        // Redirect to login page
         navigate('/login');
     };
 
@@ -196,9 +192,9 @@ const Profile = () => {
                             color: '#6b7280'
                         }}>
                             {profilePicture ? (
-                                <img 
-                                    src={profilePicture} 
-                                    alt="Profile" 
+                                <img
+                                    src={profilePicture}
+                                    alt="Profile"
                                     style={{
                                         width: '100%',
                                         height: '100%',
@@ -226,51 +222,71 @@ const Profile = () => {
                                 margin: '0 0 1.5rem 0',
                                 fontWeight: '500'
                             }}>
-                                @{getUsername(localStorage.getItem('username'))}
+                                @{getUsername(userInfo.gmail)}
                             </p>
                             
                             {/* Action Buttons */}
                             <div style={{
                                 display: 'flex',
-                                gap: '1rem'
+                                gap: '1rem',
+                                flexWrap: 'wrap' 
                             }}>
-                                <button 
+                                <button
                                     onClick={handleEditClick}
                                     style={{
-                                    backgroundColor: '#10b981',
-                                    color: 'white',
-                                    padding: '0.75rem 1rem',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontSize: '1rem',
-                                    fontWeight: '500',
-                                    cursor: 'pointer',
-                                    transition: 'background-color 0.2s'
-                                }}
-                                onMouseOver={(e) => e.target.style.backgroundColor = '#059669'}
-                                onMouseOut={(e) => e.target.style.backgroundColor = '#10b981'}
+                                        backgroundColor: '#10b981',
+                                        color: 'white',
+                                        padding: '0.75rem 1rem',
+                                        border: 'none',
+                                        borderRadius: '8px',
+                                        fontSize: '1rem',
+                                        fontWeight: '500',
+                                        cursor: 'pointer',
+                                        transition: 'background-color 0.2s'
+                                    }}
+                                    onMouseOver={(e) => e.target.style.backgroundColor = '#059669'}
+                                    onMouseOut={(e) => e.target.style.backgroundColor = '#10b981'}
                                 >
                                     Edit Personal Info
                                 </button>
-                                <button 
-                                    onClick={() => setShowOrderHistory(!showOrderHistory)}
+                                <button
+                                    onClick={() => { setShowOrderHistory(!showOrderHistory); setShowReviews(false); }}
                                     style={{
-                                    backgroundColor: '#f59e0b',
-                                    color: 'white',
-                                    padding: '0.75rem 1rem',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontSize: '1rem',
-                                    fontWeight: '500',
-                                    cursor: 'pointer',
-                                    transition: 'background-color 0.2s'
-                                }}
-                                onMouseOver={(e) => e.target.style.backgroundColor = '#d97706'}
-                                onMouseOut={(e) => e.target.style.backgroundColor = '#f59e0b'}
+                                        backgroundColor: '#f59e0b',
+                                        color: 'white',
+                                        padding: '0.75rem 1rem',
+                                        border: 'none',
+                                        borderRadius: '8px',
+                                        fontSize: '1rem',
+                                        fontWeight: '500',
+                                        cursor: 'pointer',
+                                        transition: 'background-color 0.2s'
+                                    }}
+                                    onMouseOver={(e) => e.target.style.backgroundColor = '#d97706'}
+                                    onMouseOut={(e) => e.target.style.backgroundColor = '#f59e0b'}
                                 >
                                     {showOrderHistory ? 'Hide Orders' : 'View Orders'}
                                 </button>
-                                <button 
+                                {/* New "View Reviews" button */}
+                                <button
+                                    onClick={() => { setShowReviews(!showReviews); setShowOrderHistory(false); }}
+                                    style={{
+                                        backgroundColor: '#3b82f6',
+                                        color: 'white',
+                                        padding: '0.75rem 1rem',
+                                        border: 'none',
+                                        borderRadius: '8px',
+                                        fontSize: '1rem',
+                                        fontWeight: '500',
+                                        cursor: 'pointer',
+                                        transition: 'background-color 0.2s'
+                                    }}
+                                    onMouseOver={(e) => e.target.style.backgroundColor = '#2563eb'}
+                                    onMouseOut={(e) => e.target.style.backgroundColor = '#3b82f6'}
+                                >
+                                    {showReviews ? 'Hide Reviews' : 'My Reviews'}
+                                </button>
+                                <button
                                     onClick={handleSignOut}
                                     style={{
                                         backgroundColor: '#ef4444',
@@ -294,6 +310,8 @@ const Profile = () => {
                 </div>
 
                 {showOrderHistory && <OrderHistory />}
+                {/* Conditionally render the new ReviewPage */}
+                {showReviews && <ReviewPage initialTab={location.state?.initialTab || "myReviews"} />}
 
                 {/* Personal Information Section */}
                 <div style={{
@@ -315,10 +333,9 @@ const Profile = () => {
                         }}>
                             Personal Information
                         </h2>
-                        
                         {isEditMode && (
                             <div style={{ display: 'flex', gap: '1rem' }}>
-                                <button 
+                                <button
                                     onClick={handleCancelEdit}
                                     style={{
                                         backgroundColor: '#6b7280',
@@ -332,7 +349,7 @@ const Profile = () => {
                                 >
                                     Cancel
                                 </button>
-                                <button 
+                                <button
                                     onClick={handleSave}
                                     disabled={loading}
                                     style={{
@@ -436,7 +453,7 @@ const Profile = () => {
                                     fontWeight: '500',
                                     fontStyle: 'italic'
                                 }}>
-                                    {userInfo.gmail}
+                                    {userInfo.gmail} (Cannot be changed)
                                 </span>
                             ) : (
                                 <span style={{
@@ -494,7 +511,7 @@ const Profile = () => {
                             )}
                         </div>
 
-                        {/* Address - Combined view when not editing, separate fields when editing */}
+                        {/* Address Fields */}
                         {!isEditMode ? (
                             <div style={{
                                 display: 'flex',
@@ -524,7 +541,6 @@ const Profile = () => {
                                             userInfo.city !== 'Not provided' ? userInfo.city : '',
                                             userInfo.postalCode !== 'Not provided' ? userInfo.postalCode : ''
                                         ].filter(part => part.trim() !== '');
-                                        
                                         return addressParts.length > 0 ? addressParts.join(', ') : 'Not provided';
                                     })()}
                                 </span>
@@ -532,142 +548,24 @@ const Profile = () => {
                         ) : (
                             <>
                                 {/* Address Line 1 - Edit Mode */}
-                                <div style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    padding: '1rem 0',
-                                    borderBottom: '1px solid #f3f4f6'
-                                }}>
-                                    <span style={{
-                                        fontSize: '1.1rem',
-                                        color: '#6b7280',
-                                        fontWeight: '500',
-                                        minWidth: '120px'
-                                    }}>
-                                        Address Line 1:
-                                    </span>
-                                    <input
-                                        type="text"
-                                        name="addressLine1"
-                                        value={editFormData.addressLine1 === 'Not provided' ? '' : editFormData.addressLine1}
-                                        onChange={handleInputChange}
-                                        style={{
-                                            fontSize: '1.1rem',
-                                            color: '#1f2937',
-                                            fontWeight: '500',
-                                            border: '1px solid #d1d5db',
-                                            borderRadius: '6px',
-                                            padding: '0.5rem',
-                                            width: '60%',
-                                            background: '#f9fafb'
-                                        }}
-                                        placeholder="Enter address line 1"
-                                    />
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0', borderBottom: '1px solid #f3f4f6' }}>
+                                    <span style={{ fontSize: '1.1rem', color: '#6b7280', fontWeight: '500', minWidth: '120px' }}>Address Line 1:</span>
+                                    <input type="text" name="addressLine1" value={editFormData.addressLine1 === 'Not provided' ? '' : editFormData.addressLine1} onChange={handleInputChange} style={{ fontSize: '1.1rem', color: '#1f2937', fontWeight: '500', border: '1px solid #d1d5db', borderRadius: '6px', padding: '0.5rem', width: '60%', background: '#f9fafb' }} placeholder="Enter address line 1" />
                                 </div>
-
                                 {/* Address Line 2 - Edit Mode */}
-                                <div style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    padding: '1rem 0',
-                                    borderBottom: '1px solid #f3f4f6'
-                                }}>
-                                    <span style={{
-                                        fontSize: '1.1rem',
-                                        color: '#6b7280',
-                                        fontWeight: '500',
-                                        minWidth: '120px'
-                                    }}>
-                                        Address Line 2:
-                                    </span>
-                                    <input
-                                        type="text"
-                                        name="addressLine2"
-                                        value={editFormData.addressLine2 || ''}
-                                        onChange={handleInputChange}
-                                        style={{
-                                            fontSize: '1.1rem',
-                                            color: '#1f2937',
-                                            fontWeight: '500',
-                                            border: '1px solid #d1d5db',
-                                            borderRadius: '6px',
-                                            padding: '0.5rem',
-                                            width: '60%',
-                                            background: '#f9fafb'
-                                        }}
-                                        placeholder="Enter address line 2 (optional)"
-                                    />
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0', borderBottom: '1px solid #f3f4f6' }}>
+                                    <span style={{ fontSize: '1.1rem', color: '#6b7280', fontWeight: '500', minWidth: '120px' }}>Address Line 2:</span>
+                                    <input type="text" name="addressLine2" value={editFormData.addressLine2 || ''} onChange={handleInputChange} style={{ fontSize: '1.1rem', color: '#1f2937', fontWeight: '500', border: '1px solid #d1d5db', borderRadius: '6px', padding: '0.5rem', width: '60%', background: '#f9fafb' }} placeholder="Enter address line 2 (optional)" />
                                 </div>
-
                                 {/* City - Edit Mode */}
-                                <div style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    padding: '1rem 0',
-                                    borderBottom: '1px solid #f3f4f6'
-                                }}>
-                                    <span style={{
-                                        fontSize: '1.1rem',
-                                        color: '#6b7280',
-                                        fontWeight: '500',
-                                        minWidth: '120px'
-                                    }}>
-                                        City:
-                                    </span>
-                                    <input
-                                        type="text"
-                                        name="city"
-                                        value={editFormData.city === 'Not provided' ? '' : editFormData.city}
-                                        onChange={handleInputChange}
-                                        style={{
-                                            fontSize: '1.1rem',
-                                            color: '#1f2937',
-                                            fontWeight: '500',
-                                            border: '1px solid #d1d5db',
-                                            borderRadius: '6px',
-                                            padding: '0.5rem',
-                                            width: '60%',
-                                            background: '#f9fafb'
-                                        }}
-                                        placeholder="Enter your city"
-                                    />
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0', borderBottom: '1px solid #f3f4f6' }}>
+                                    <span style={{ fontSize: '1.1rem', color: '#6b7280', fontWeight: '500', minWidth: '120px' }}>City:</span>
+                                    <input type="text" name="city" value={editFormData.city === 'Not provided' ? '' : editFormData.city} onChange={handleInputChange} style={{ fontSize: '1.1rem', color: '#1f2937', fontWeight: '500', border: '1px solid #d1d5db', borderRadius: '6px', padding: '0.5rem', width: '60%', background: '#f9fafb' }} placeholder="Enter your city" />
                                 </div>
-
                                 {/* Postal Code - Edit Mode */}
-                                <div style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    padding: '1rem 0'
-                                }}>
-                                    <span style={{
-                                        fontSize: '1.1rem',
-                                        color: '#6b7280',
-                                        fontWeight: '500',
-                                        minWidth: '120px'
-                                    }}>
-                                        Postal Code:
-                                    </span>
-                                    <input
-                                        type="text"
-                                        name="postalCode"
-                                        value={editFormData.postalCode === 'Not provided' ? '' : editFormData.postalCode}
-                                        onChange={handleInputChange}
-                                        style={{
-                                            fontSize: '1.1rem',
-                                            color: '#1f2937',
-                                            fontWeight: '500',
-                                            border: '1px solid #d1d5db',
-                                            borderRadius: '6px',
-                                            padding: '0.5rem',
-                                            width: '60%',
-                                            background: '#f9fafb'
-                                        }}
-                                        placeholder="Enter postal code"
-                                    />
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0' }}>
+                                    <span style={{ fontSize: '1.1rem', color: '#6b7280', fontWeight: '500', minWidth: '120px' }}>Postal Code:</span>
+                                    <input type="text" name="postalCode" value={editFormData.postalCode === 'Not provided' ? '' : editFormData.postalCode} onChange={handleInputChange} style={{ fontSize: '1.1rem', color: '#1f2937', fontWeight: '500', border: '1px solid #d1d5db', borderRadius: '6px', padding: '0.5rem', width: '60%', background: '#f9fafb' }} placeholder="Enter postal code" />
                                 </div>
                             </>
                         )}
