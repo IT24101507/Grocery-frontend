@@ -242,7 +242,7 @@ const CheckoutPage = () => {
                     <div className="form-section">
                         <h2 className="ssection-title">Delivery Options</h2>
                         <div className="radio-group">
-                            <label className={`radio-option ${formData.deliveryMethod === 'home' ? 'selected' : ''}`}>
+                            <label className={`radio-option ${formData.deliveryMethod === 'home' ? 'selected' : ''} ${formData.paymentMethod === 'pay-at-store' ? 'disabled' : ''}`}>
                                 <input 
                                     type="radio" 
                                     name="delivery" 
