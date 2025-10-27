@@ -629,6 +629,7 @@ const GroceryAdminDashboard = () => {
                         <th>Customer</th>
                         <th>Mobile Number</th>
                         <th>Date</th>
+                        <th>Items</th>
                         <th>Total</th>
                         <th>Status</th>
                       </tr>
@@ -640,6 +641,20 @@ const GroceryAdminDashboard = () => {
                           <td>{order.customerName}</td>
                           <td>{order.mobileNumber}</td>
                           <td>{new Date(order.orderDate).toLocaleDateString()}</td>
+                          <td className="order-items">
+                            {order.items && order.items.length > 0 ? (
+                              <ul>
+                                {order.items.map((item, index) => (
+                                  <li key={index}>
+                                    {item.productName || item.product?.name} 
+                                    <span className="item-quantity"> ({item.quantity})</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <span className="no-items">No items</span>
+                            )}
+                          </td>
                           <td className="font-medium">Rs {(order.totalPrice || 0).toFixed(2)}</td>
                           <td>
                             <select
