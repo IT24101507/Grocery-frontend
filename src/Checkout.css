@@ -364,6 +364,32 @@ body {
     box-shadow: inset 0 0 0 3px #fff;
 }
 
+/* Disabled/greyed state for radio options (used when an option is not available) */
+.radio-option.disabled {
+    opacity: 0.65;
+    pointer-events: none; /* prevent hover/click */
+    background-color: #f5f5f5;
+    border-color: #e9ecef;
+    color: #8a8a8a;
+}
+
+.radio-option.disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.radio-option.disabled .option-title,
+.radio-option.disabled .option-description,
+.radio-option.disabled .option-icon {
+    color: #8a8a8a;
+    opacity: 0.9;
+}
+
+.radio-option.disabled::before {
+    border-color: #dcdcdc;
+    background-color: #f5f5f5;
+}
+
 .order-summary {
     background: white;
     border-radius: 10px;
