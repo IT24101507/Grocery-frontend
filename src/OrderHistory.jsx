@@ -75,9 +75,9 @@ const OrderHistory = () => {
                                 <td>#{order.id}</td>
                                 <td>{new Date(order.orderDate).toLocaleDateString()}</td>
                                 <td className="order-items">
-                                    {order.orderItems && order.orderItems.length > 0 ? (
+                                    {order.items && order.items.length > 0 ? (
                                         <ul>
-                                            {order.orderItems.map((item, index) => (
+                                            {order.items.map((item, index) => (
                                                 <li key={index}>
                                                     {/* Display product name (adjust based on your backend response) */}
                                                     {item.productName || item.product?.name} 
