@@ -64,6 +64,7 @@ const OrderHistory = () => {
                         <tr>
                             <th>Order ID</th>
                             <th>Date</th>
+                            <th>Items</th>
                             <th>Total Price</th>
                             <th>Status</th>
                         </tr>
@@ -73,6 +74,25 @@ const OrderHistory = () => {
                             <tr key={order.id}>
                                 <td>#{order.id}</td>
                                 <td>{new Date(order.orderDate).toLocaleDateString()}</td>
+                                <td className="order-items">
+                                    {order.orderItems && order.orderItems.length > 0 ? (
+                                        <ul>
+                                            {order.orderItems.map((item, index) => (
+                                                <li key={index}>
+                                                    {/* Display product name (adjust based on your backend response) */}
+                                                    {item.productName || item.product?.name} 
+                                                    <span className="item-quantity"> ({item.quantity})</span>
+                                                    {/* Optional: show individual item price */}
+                                                    {item.price && (
+                                                        <span className="item-price"> - Rs. {item.price.toFixed(2)}</span>
+                                                    )}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <span className="no-items">No items</span>
+                                    )}
+                                </td>
                                 <td>Rs. {order.totalPrice ? order.totalPrice.toFixed(2) : '0.00'}</td>
                                 <td className={`order-status status-${order.status ? order.status.toLowerCase() : 'unknown'}`}>
                                     {order.status}
